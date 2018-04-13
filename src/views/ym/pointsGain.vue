@@ -94,12 +94,10 @@
   </div>
 </template>
 <script>
-require("../../assets/ym/js/laydate/laydate.js");
-require("../../assets/ym/js/laydate/skins/default/laydate.css");
 import pagination from "../ym/page.vue";
 import details from "../ym/searchListDetails.vue";
 import layerForm from '../ym/layerForm.vue'
-import {setStore, getStore, createDownload} from '../../config/utils';
+import {setStore, getStore, createDownload,errorDeal} from '../../config/utils';
 import axios from 'axios';
 import {reqCommonMethod} from "../../config/service.js";
 export default{
@@ -226,9 +224,7 @@ export default{
 			      	}else if(response.code!=200){
 				     vm.off.getPoints='0';
 			      	}
-                }).catch(()=>{
-
-                });
+                }).catch(error=>errorDeal(error));    
 				}else{
 					layer.open({
 			          content:'请输入订单号码',
@@ -299,9 +295,7 @@ export default{
 			      	}else if(response.code!=200){
 				     vm.off.getPoints='0';
 			      	}
-                }).catch(()=>{
-
-                });                
+                }).catch(error=>errorDeal(error));                  
 			}
 		}
 	}

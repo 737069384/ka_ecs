@@ -60,7 +60,7 @@
         <div class="m-total-table" v-if="list">
           <div class="total-head">
               统计结果<b>{{total}}</b>
-              <button class="export_excel" v-if="list.length==0?false :true "  :disabled="list.length==0? true : false " @click="searchList(2)">导出excel</button>
+              <button class="btn_export_excel" v-if="list.length==0?false :true "  :disabled="list.length==0? true : false " @click="searchList(2)">导出excel</button>
           </div>
           <table>
             <thead>
@@ -102,10 +102,8 @@
   </section>
 </template>
 <script>
-  require("../../../assets/km/js/laydate/laydate.js");
-  require("../../../assets/km/js/laydate/skins/default/laydate.css");
   import {reqCommonMethod} from "../../../config/service.js";  
-  import pagination from "../../../componentskm/Page.vue";
+  import pagination from "../../../componentskm/page.vue";
   import details from "../../../componentskm/onlineHallOrderDetails.vue";
   import {createDownload} from '../../../config/utils';
   export default{
@@ -233,25 +231,18 @@
         }
         //如果index===1||index==='order'就发送ajax请求
         if(index===1||index==='order'){
-        //   vm.AJAX('w/boss/order/query',json,function(data){
-        //     vm.list=data.data.list;//数据
-        //     vm.total=data.data.total;//总条数
-        //     vm.maxpage=Math.ceil(parseInt(data.data.total)/10);//最大页码
-        //     vm.pageNum=page||1;
-        //     vm.callback=function(v){vm.searchList(index,v)};
-        //   },function(){
-        //     vm.off.isLoad=false;
-        //   })
-        reqCommonMethod(json,function(){vm.off.isLoad=false;},"km-ecs/w/boss/order/query")
-            .then((data)=>{
-              	vm.list=data.data.list
-				vm.total=data.data.total;
-				vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
-				vm.pageNum=page||1;
-				vm.callback=function(v){vm.searchList(v)};  
-            }).catch(()=>{
-                vm.off.isLoad=false;
-            })
+          vm.off.isLoad=true;
+          reqCommonMethod(json,function(){
+            vm.off.isLoad=false;
+          },"km-ecs/w/boss/order/query")
+              .then((data)=>{
+                  vm.list=data.data.list
+                  vm.total=data.data.total;
+                  vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
+                  vm.pageNum=page||1;
+                  vm.callback=function(v){vm.searchList(index,v)}; 
+                  vm.off.isLoad=false; 
+              }).catch(error=>errorDeal(error)); 	 
         }
         //如果index===2则导出excel
         if(index===2){
@@ -318,9 +309,8 @@
         .then((data)=>{
             vm.detailsData=data.data.list[0];
             vm.off.details=true;
-        }).catch(()=>{
             vm.off.isLoad=false;
-        })
+        }).catch(error=>errorDeal(error)); 	 
       }
       ,to_laydate:function(v){
         var vm=this;

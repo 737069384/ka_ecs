@@ -10,8 +10,8 @@
   .total-head{position: relative;}
   .total-head>span{margin-right: 10px;}
   .total-head>span>b{font-weight: bold;}
-  .total-head>.f-btn-group{position: absolute;width:3.5rem;left: 50%;margin-left:-1.75rem;top:50%;margin-top: -0.16rem;}
-  .total-head>.f-btn-group>button{height:0.32rem;color:#717171 !important;border-radius: 5px; border-bottom-color:#ccc;-webkit-box-shadow:0 1px 1px rgba(90, 90, 90, 0.1);box-shadow:0 1px 1px rgba(90, 90, 90, 0.1);display:inline-block;padding: 0 3px;font-size:12px;line-height:1.428571429;cursor:pointer;background-color:#fff;border:1px solid transparent;border-color:#dadada;}
+  .total-head>.f-btn-group{position: absolute;width:4rem;left: 50%;margin-left:-2rem;top:50%;margin-top: -0.15rem;}
+  .total-head>.f-btn-group>button{height:0.3rem;line-height:0.3rem;color:#717171 !important;border-radius: 5px; border-bottom-color:#ccc;-webkit-box-shadow:0 1px 1px rgba(90, 90, 90, 0.1);box-shadow:0 1px 1px rgba(90, 90, 90, 0.1);display:inline-block;padding: 0 3px;font-size:12px;cursor:pointer;background-color:#fff;border:1px solid transparent;border-color:#dadada;}
   .total-head>.f-btn-group>button:hover{color:#333333;background-color:#f1f1f1;}
   .total-head>.f-btn-group>button.active{color:#717171 !important;background-color:#F9F9F9;border-color:#c6c6c6;box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);}
   .total-head>.m-select{display: none;margin-left:0.1rem;}
@@ -137,10 +137,13 @@
 								</tr>
 								<tr>
 									<td><span>售卡范围：</span>
-										<b v-if="ajaxData.details.attribute==1">A（远特售卡）</b>
+										<!-- <b v-if="ajaxData.details.attribute==1">A（远特售卡）</b>
 										<b v-if="ajaxData.details.attribute==2">B（联通售卡）</b>
 										<b v-if="ajaxData.details.attribute==3">C（远特售卡+联通售卡）</b>
-										<b v-if="ajaxData.details.attribute==4">D（联通售卡+远特售卡）</b>
+										<b v-if="ajaxData.details.attribute==4">D（联通售卡+远特售卡）</b> -->
+                                        <b v-for="auditData in ajaxData.details.openedScopes">
+                                            <span v-if="auditData.type==1">远特售卡</span><span v-if="auditData.type==2">联通售卡</span><span v-if="auditData.type==3">移动售卡</span><span v-if="auditData.type==4">电信售卡</span>(<span>{{auditData.areas}}</span>)
+                                        </b>
 									</td>
 									<td><span>真实信用积分：</span>{{ ajaxData.details.realCreditNums }}</td>
 								</tr>
@@ -158,12 +161,12 @@
 								</tr>
 								<tr>
 									<td><span>设备信息：</span>
-										<a :href="'#/home/resource/device/'+ajaxData.details.devMac" title="点击查看详情" class="details m-l">{{ ajaxData.details.devMac }}</a></td>
+										<a :href="'#/homek/resource/device/'+ajaxData.details.devMac" title="点击查看详情" class="details m-l">{{ ajaxData.details.devMac }}</a></td>
 									<td><span>基础分值：</span>{{ ajaxData.details.btScore }}</td>
 								</tr>
 								<tr>
 									<td><span>上级商户：</span>
-										<a v-show="ajaxData.details.superDealerId" :href="'#/home/resource/promoter/'+ajaxData.details.superDealerId" title="点击查看详情" class="details">{{ajaxData.details.superDealerId}}</a>【名称：{{ ajaxData.details.superDealerName||'--' }}】</td>
+										<a v-show="ajaxData.details.superDealerId" :href="'#/homek/resource/promoter/'+ajaxData.details.superDealerId" title="点击查看详情" class="details">{{ajaxData.details.superDealerId}}</a>【名称：{{ ajaxData.details.superDealerName||'--' }}】</td>
 									<td><span>基础总次数：</span>{{ ajaxData.details.btFrequency }}</td>
 								</tr>
 								<tr>
@@ -173,7 +176,7 @@
 								</tr>
 								<tr>
 									<td><span>上级推广渠道ID：</span>
-										<a v-show="ajaxData.details.superDealerId" :href="'#/home/resource/promoter/'+ajaxData.details.superDealerId" title="点击查看详情" class="details">{{ajaxData.details.popDealerId}}</a>【名称：{{ ajaxData.details.popDealerName||'--' }}】</td>
+										<a v-show="ajaxData.details.superDealerId" :href="'#/homek/resource/promoter/'+ajaxData.details.superDealerId" title="点击查看详情" class="details">{{ajaxData.details.popDealerId}}</a>【名称：{{ ajaxData.details.popDealerName||'--' }}】</td>
 									<td><span>推广渠道：</span>{{ ajaxData.details.popDealerId||'--' }}【名称：{{ ajaxData.details.popDealerName||'--' }}】</td>
 									
 								</tr>
@@ -379,8 +382,8 @@
 </template>
 <script>
 import {reqCommonMethod} from "../../../config/service.js";  
-import pagination from "../../../componentskm/Page.vue";
-import { getDateTime } from "../../../config/utils.js"
+import pagination from "../../../componentskm/page.vue";
+import { getDateTime,errorDeal } from "../../../config/utils.js"
 export default{
 	name:'merchantSearch',
 	data (){
@@ -423,6 +426,10 @@ export default{
 			vm.getTotal();
 			let val=vm.$route.params.val;
 			if(val!='null'){
+				if(val.indexOf('phone')>-1){
+					vm.form.type=2;
+					val=parseInt(val);
+				}
 				vm.form.context=val;
 				vm.getDetails();
 			}
@@ -445,9 +452,7 @@ export default{
             reqCommonMethod({},function(){vm.off.isLoad=false;},"km-ecs/w/merchant/statistics")
             .then((data)=>{
                 vm.totalInfo=data.data;
-            }).catch(()=>{
-                vm.off.isLoad=false;
-            })
+            }).catch(error=>errorDeal(error)); 	
 		},
 		shiftType(){//radio切换
 			this.ajaxData={
@@ -516,15 +521,14 @@ export default{
             reqCommonMethod(json,function(){vm.off.isLoad=false;},url)
             .then((data)=>{
                 vm.ajaxData.details=data.data;
-				vm.getList();
-            }).catch(()=>{
                 vm.off.isLoad=false;
-            })
+                vm.getList();
+            }).catch(error=>errorDeal(error)); 	
 		},
 		getList(page){//获取第三方支付订单列表/获取用户列表
 			var vm=this,type=vm.form.type,url,json;
 			type==1 ? (json={dealerId:vm.form.context},url='km-ecs/w/audit/getUsersDetail') : (json={phone:vm.form.context,pageNum:page||1,pageSize:10,type:vm.form.paySource},url='km-ecs/w/user/paymengList');
-
+			console.log(1)
 			if(vm.off.isLoad)return false;
 			vm.off.isLoad=true;
 			vm.ajaxData.list=[];
@@ -543,10 +547,9 @@ export default{
 				vm.ajaxData.total=data.data.total||0;
 				vm.ajaxData.maxpage=Math.ceil(parseInt(data.data.total)/10);
 				vm.ajaxData.pageNum=page||1;
-				vm.ajaxData.callback=function(v){vm.getList(v)};
-             }).catch(()=>{
+                vm.ajaxData.callback=function(v){vm.getList(v)};
                 vm.off.isLoad=false;
-             })
+             }).catch(error=>errorDeal(error)); 	
 		},
 		getDateTime:function(e) {
 			return getDateTime(e);

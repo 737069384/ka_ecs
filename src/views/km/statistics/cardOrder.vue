@@ -39,8 +39,6 @@
 	</section>
 </template>
 <script>
-require("../../../assets/km/js/laydate/laydate.js");
-require("../../../assets/km/js/laydate/skins/default/laydate.css");
 import {reqCommonMethod} from "../../../config/service.js";
 export default{
 	name:'cardOrderDownload',
@@ -99,6 +97,7 @@ export default{
 		        return false;
 			}
 			vm.AJAX('km-ecs/w/audit/dealerListDown',json,function(data){
+                console.log(data);
 				var frame=document.getElementById('downloadFrame');
 				frame.setAttribute('src',data.data.url);
 			})

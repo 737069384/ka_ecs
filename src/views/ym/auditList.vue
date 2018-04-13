@@ -1,5 +1,6 @@
 <style scoped>
-  @import "../../assets/ym/css/audit.css";
+  /* @import "../../assets/km/css/cardOrderDetails.css"; */
+  @import "../../assets/ym/css/audit.css"; 
 	.redF{
 		color: #AE0B39;
 		font-weight: bold;
@@ -13,7 +14,7 @@
 	  	  	<div class="m-time-down"  style="display:none">审核计时：<span class="f-c-red">{{off.time}}</span></div>
 	  	  	<div class="m-foot-btn" :class="{scroll:off.isScroll}">
 	  	  		<a class="f-btn f-btn-success" @click="agree">同意</a>
-				<a v-if="off.isBugginPower" class="f-btn f-btn-warning" @click="agree2">准同意</a>
+				<a class="f-btn f-btn-warning" @click="agree2">准同意</a>
 				<a class="f-btn f-btn-danger" @click="refuse">拒绝</a>
 		  	</div>
 	  	  </header>
@@ -135,6 +136,8 @@
 </template>
 <script>
 import {reqCommonMethod} from "../../config/service.js";
+import {errorDeal,getStore} from "../../config/utils.js";
+import {mapState, mapMutations, mapActions} from 'vuex';
 export default{
 	name:'auditList',
 	data (){
@@ -156,14 +159,15 @@ export default{
 			imgData:[{"name":''}],//当前订单的图片
 			imgIndex:0,//图片索引
 			refuseArr:["没有用户签名或签名与用户姓名不符","部分或全部照片中存在模糊、分辨率太小无法辨认/严重变形/反光严重/拍摄角度不规范","部分/全部照片中存在非远特SIM卡号码现象","部分/全部照片中的SIM卡号码与填报号码不符","无证件与SIM卡合影(包括身份证正反面及现场手持照)","背景非通讯营业网点、非通讯销售商业场所或非售卡现场拍摄照片(包括证件及手持照)","手持证卡合影不规范,非免冠正脸照、人脸被遮挡等导致无法清晰辨别是否为本人","同一证件、姿态手持合影照,与不同号码交叉反复提交","同一证件为不同号码当日交叉提交达三次以上","非有效期证件或申卡人未满16周岁","填报信息与证照中信息不符、缺失内容或乱码(包括但不限于证件号码,姓名,地址等信息)","发证机关与证件行政归属地不符","部分或全部照片内容为疑似翻拍或合成","非本人现场手持证卡照（严重违规）","证件与手持合影照中证件不同（严重违规）","已被拒绝并明知信息有问题仍然多次重复恶意上传（严重违规）","部分或全部照片内容被明确为翻拍或合成、造假（严重违规）"]
-          
         }
 	},
 	created:function(){
-		// var userInfo=localStorage.getItem('ECS_INFO');
-		// userInfo.isadmin&&userInfo.isadmin.indexOf('4')>-1 ? this.off.isBugginPower=true : this.off.isBugginPower=false;
+        var userInfo=localStorage.getItem('ECS_INFO');
+        
+        userInfo=getStore("KA_ECS_USER");
+		userInfo.isadmin&&userInfo.isadmin.indexOf('4')>-1 ? this.off.isBugginPower=true : this.off.isBugginPower=false;
 		this.getAuditList();
-		//this.dealAuditList();
+		this.dealAuditList();
 	},
 	mounted:function(){
 		var vm=this;
@@ -188,7 +192,7 @@ export default{
 			// 		}
 			// 	})
             // });
-            reqCommonMethod({"orderId":orderId,"result":1,"remark":'',"reason": ''},function(){vm.off.isLoad=false;},"ym-ecs/c/audit/audit")
+            reqCommonMethod({"orderId":orderId,"result":1,"remark":'',"reason": ''},function(){vm.off.isLoad=false;console.log(1111)},"ym-ecs/c/audit/audit")
             .then((data)=>{
                 layer.open({
 					content:data.msg,
@@ -198,12 +202,11 @@ export default{
 					success:function(){
 						vm.dealAuditList();
 					}
-				})
-            }).catch(()=>{
-
-            });
+                })
+                vm.off.isLoad=false;
+            }).catch(error=>errorDeal(error)); 
 		},
-		agree2:function(){//准同意
+        agree2:function(){//准同意
 			var vm=this,orderId=vm.auditData.orderId,popIndex,ww=window.innerWidth,wwSet;
 			ww<=640 ? wwSet='width:98%' : wwSet='max-width:610px';
 			popIndex=layer.open({
@@ -241,12 +244,12 @@ export default{
 							msgSkin:'success',
 							success:function(){
 								layer.close(popIndex);
-								vm.dealAuditList();
+                                vm.dealAuditList();
+                                vm.off.isLoad=false;                                
 							}
-						});
-                    }).catch(()=>{
-
-                    });
+                        });
+                        vm.off.isLoad=false;
+                    }).catch(error=>errorDeal(error)); 
 				}
 			});
 
@@ -297,12 +300,12 @@ export default{
 							msgSkin:'success',
 							success:function(){
 								vm.dealAuditList();
-								layer.close(popIndex);
+                                layer.close(popIndex);
+                                vm.off.isLoad=false;                                
 							}
-						})
-                    }).catch(()=>{
-
-                    });
+                        });
+                        vm.off.isLoad=false;
+                    }).catch(error=>errorDeal(error)); 
 				}
 			})
 
@@ -424,14 +427,13 @@ export default{
 					title:'自动审核详情',
 					btn:0,
 					style:'width:auto;'
-				});
-            }).catch(()=>{
-
-            });
+                });
+                vm.off.isLoad=false;
+            }).catch(error=>errorDeal(error)); 
 		},
-		getAuditList:function(){//获取订单
+        getAuditList:function(){//获取订单
             var vm=this,orderId,url,json={},type=vm.$route.params.type;
-            if(typeof(type)=="number"){
+            if(typeof type=="number"){
                 type==3&&(type=6);
                 url="ym-ecs/c/audit/toaudit";
                 json.type=type;
@@ -470,15 +472,9 @@ export default{
 				}
 				vm.list=data.data.list;
 				vm.off.auditIndex=0;
-				vm.dealAuditList();
-            }).then(()=>{
-				vm.off.isLoad=0;
-            }).catch(()=>{
-
-            })
-        //    function(){
-		// 		vm.off.isLoad=0;
-		// 	})
+                vm.dealAuditList();
+                vm.off.isLoad=false;
+            }).catch(error=>errorDeal(error)); 
 		},
 		dealAuditList:function(){//处理分配的订单
 			const vm=this,len=vm.list.length;

@@ -83,16 +83,14 @@
 										<span v-show="auditData.merchantType==2">个人</span>
 									</td></tr>
 									<tr><td>售卡权限：</td><td>
-										<span v-show="auditData.merchantAttribute==1">远特卡</span>
-										<span v-show="auditData.merchantAttribute==2">联通卡</span>
-										<span v-show="auditData.merchantAttribute==3">远特卡+联通卡</span>
-										<span v-show="auditData.merchantAttribute==4">联通卡+远特卡</span>
+                                        <span v-show="auditData.openingType==1">远特卡<span v-if="auditData.openingArea">({{auditData.openingArea}})</span></span>
+										<span v-show="auditData.openingType==2">联通卡<span v-if="auditData.openingArea">({{auditData.openingArea}})</span></span>
+										<span v-show="auditData.openingType==3">移动卡<span v-if="auditData.openingArea">({{auditData.openingArea}})</span></span>
+										<span v-show="auditData.openingType==4">电信卡<span v-if="auditData.openingArea">({{auditData.openingArea}})</span></span>
 									</td></tr>
 									<tr><td>折扣模式：</td><td>{{auditData.discountModel}}</td></tr>
 									<tr><td>号码模式：</td><td>{{auditData.phoneModel}}</td></tr>
 									<tr><td>转账模式：</td><td>{{auditData.transferModel}}</td></tr>
-									
-									
 									<tr><td>设备编号：</td><td>{{auditData.devMac}}</td></tr>
 									<tr><td>设备MAC：</td><td>{{auditData.devMacAddress}}</td></tr>
 									<tr><td>推广渠道ID：</td><td>{{auditData.popchannel}}</td></tr>
@@ -193,11 +191,10 @@ export default{
 						vm.dealAuditList();
 					}
 				}) 
-            })            
+            }).catch(error=>errorDeal(error));             
 		},
 		refuse:function(obj){//审核拒绝
 			var str='',vm=this,orderId=vm.auditData.orderId,popIndex,ww=window.innerWidth,wwSet;
-		
 			for(let i=0;i<vm.refuseArr.list.length;i++){
 				var b='';
 				if(vm.refuseArr.list[i].stopCard==1)b='<b class="f-c-red">★</b>';
@@ -244,7 +241,7 @@ export default{
 								layer.close(popIndex);
 							}
 						})
-                    });					
+                    }).catch(error=>errorDeal(error)); 					
 				}
 			})
 		},
@@ -262,17 +259,17 @@ export default{
 			            skin: 'msg',
 			            time: 4,
 			            msgSkin:'error',
-			        })
+                    })
+                    vm.off.isLoad=false;
 			        return false;
 				}
 				vm.list=data.data.list;
 				vm.off.auditIndex=0;
 				vm.dealAuditList();
 				window.clearInterval(vm.timer);
-				vm.timeDown(parseInt(vm.list[0].peirod));
-            }).then(()=>{
-                vm.off.isLoad=0;
-            });	
+                vm.timeDown(parseInt(vm.list[0].peirod));
+                vm.off.isLoad=false;
+            }).catch(error=>errorDeal(error)); 	
 		},
 		// 激活审核国政通校验
 		gztBtn:function(){
@@ -302,9 +299,7 @@ export default{
 				        })
 				    }
 				}
-            }).then(()=>{
-                vm.off.isLoad=0;
-            });         
+            }).catch(error=>errorDeal(error)); 	        
 		}
 		,
 		dealAuditList:function(){//处理分配的订单

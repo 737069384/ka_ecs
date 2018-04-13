@@ -181,7 +181,7 @@
 						<span v-else>--</span>
 					</td>
 					<td>{{todo.userName}}</td>
-					<td>{{todo.phoneNumber}}</td>
+					<td>{{todo.phoneNumber}}<div><span v-show="todo.phoneHome">（{{ todo.phoneHome }}）</span></div></td>
 					<!-- <td>{{translateData(5,todo.phoneLevel)}}</td> -->
 					<td>{{todo.identityCard}}</td>
 					<td v-if="off.type==1||off.type==2">{{todo.customerName}}</td>
@@ -244,11 +244,9 @@
   </div>
 </template>
 <script>
-require("../../../assets/km/js/laydate/laydate.js");
-require("../../../assets/km/js/laydate/skins/default/laydate.css");
 require('../../../assets/km/js/base64.min.js');
 import {searchAuditList,reAudit,reqCommonMethod} from "../../../config/service.js"
-import pagination from "../../../componentskm/Page.vue";
+import pagination from "../../../componentskm/page.vue";
 import details from "../../../componentskm/cardOrderDetails.vue";
 import { getDateTime,translateData,secondsFormat,getUnixTime,createDownload,setStore, getStore, errorDeal } from "../../../config/utils.js";
 export default{
@@ -361,10 +359,10 @@ export default{
 			json.context=context;
 			json.searchtype=vm.form.select;
 			if(vm.form.source==7){
-				url="w/handler/query";
+				url="km-ecs/w/handler/query";
 				json=vm.getSdkJson(json);
 			}else if(vm.form.source==8){
-				url="w/handler/query";
+				url="km-ecs/w/handler/query";
 				json=vm.getTfJson(json);
 			}else{
 				vm.off.type==1 ? url='km-ecs/w/audit/ingList' : url='km-ecs/w/audit/edList';
@@ -386,10 +384,9 @@ export default{
 				vm.total=data.data.total;
 				vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
 				vm.pageNum=page||1;
-				vm.callback=function(v){vm.searchList(v)};
-            }).catch(()=>{
+                vm.callback=function(v){vm.searchList(v)};
                 vm.off.isLoad=false;
-            }) 
+            }).catch(error=>errorDeal(error)); 	 
 		},
 		searchClosedAndDoing:function(page){//进行中,已关闭
 			var vm=this,url,json={"source":vm.form.source,"type":vm.form.orderType,"pageSize":vm.pageSize,"pageNum":page||1,"startTime":vm.form.startTime,"endTime":vm.form.endTime,"status":vm.off.type,"statusDetail":vm.form.orderStatus,"cardType":vm.form.cardType};
@@ -437,7 +434,6 @@ export default{
 			}
 			json.context=context;
 			json.searchtype=vm.form.select;
-
 			if(vm.off.isLoad)return false;
 			vm.off.isLoad=true;
 			// vm.AJAX('w/audit/getOrderList',json,function(data){
@@ -456,12 +452,10 @@ export default{
 			    	vm.total=data.data.total;
 			        vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
 			        vm.pageNum=page||1;
-			        vm.callback=function(v){vm.searchClosedAndDoing(v)};
+                    vm.callback=function(v){vm.searchClosedAndDoing(v)};
+                    vm.off.isLoad=false;
                  }
-             ).catch(()=>{
-                 vm.off.isLoad=false;
-                 }
-             );
+             ).catch(error=>errorDeal(error)); 	
 		},
 		// 导出查询结果excel
 		downLoadList:function(page){
@@ -634,9 +628,9 @@ export default{
 			}else if(type==3||type==4){
 				resJson.opKey="tf.orderApp.list";
 				if(type==3){
-					sql+=" AND B.result=6";
+					sql+=" AND A.order_status=1";
 				}else if(type==4){
-					sql+=" AND B.result=3";
+					sql+=" AND A.order_status=4";
 				}
 
 				if(json.status!=0&&json.searchtype!=1){
@@ -692,10 +686,9 @@ export default{
 		            msgSkin:'success',
 		        })
 				vm.list[number].status=4
-				vm.list[number].cardStatus=1
-            }).catch(()=>{
-                return;
-            })
+                vm.list[number].cardStatus=1
+                vm.off.isLoad=false;
+            }).catch(error=>errorDeal(error)); 	
 		},
 		details:function(e){//详情
 			var vm=this,url,
@@ -705,7 +698,7 @@ export default{
 			sql='A.sys_order_id="'+orderId+'"';
 			vm.off.number=e.target.title;
 			if(vm.form.source==7){//SDK
-				url="w/handler/query";
+				url="km-ecs/w/handler/query";
 				if(type==1||type==2){
 					json.opKey="sdk.orderAudit.details";
 					if(type==2){
@@ -725,7 +718,7 @@ export default{
 				json.pageSize="10";
 				json.pageNum="-1";
 			}else if(vm.form.source==8){//通服
-				url="w/handler/query";
+				url="km-ecs/w/handler/query";
 				if(type==1||type==2){
 					json.opKey="tf.orderAudit.details";
 					if(type==2){
@@ -736,9 +729,9 @@ export default{
 				}else if(type==3||type==4){
 					json.opKey="tf.orderApp.details";
 					if(type==3){
-						sql+=" AND B.result=1";
+						sql+=" AND A.order_status=1";
 					}else if(type==4){
-						sql+=" AND B.result=4";
+						sql+=" AND A.order_status=4";
 					}
 				}
 				json.params=[sql];
@@ -767,10 +760,9 @@ export default{
 				}else{
 					vm.detailsData=data.data;
 				}
-				vm.off.details=true;
-            }).catch(()=>{
+                vm.off.details=true;
                 vm.off.isLoad=false;
-            })
+            }).catch(error=>errorDeal(error)); 	
 		},
 		to_laydate:function(v){
 

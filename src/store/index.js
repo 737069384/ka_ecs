@@ -27,10 +27,22 @@ const state = {
 		opinionTotal1:0,//意见反馈未处理
 		opinionTotal2:0,//意见反馈处理中
 		opinionTotal3:0,//意见反馈已完成
-	},
+    },
+    auditCountYm:{
+        "whiteCard": 0,//开白卡待审核数
+        "readyCard": 0,//开成卡待审核数
+        "newChangeCard": 0,//补换卡待审核数
+        "realNameCollection": 0,//实名补录待审核数
+        "fill": 0,
+        "whiteCard_1": 0,
+        "readyCard_1": 0,
+        "newChangeCard_1": 0,
+        "realNameCollection_1": 0,
+        "fill_1": 0
+    },
 	countTotal:0,//审核总待审核数
     OpcountTotal:0,//意见反馈数统计
-    auditCountYm:0,//ym审核总待审核数
+    countTotalYm:0,//远盟总待审核数
 	offCountChange:true,//统计变化开关
 	onlineTime:'00:00:00',//在线时间
 	timer:{//定时器对象
@@ -40,7 +52,6 @@ const state = {
         countYm:null,        
 	},
 };
-
 export default new Vuex.Store({
 	state,
 	getters,

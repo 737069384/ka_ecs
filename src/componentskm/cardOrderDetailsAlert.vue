@@ -8,11 +8,11 @@
 #detailsView table td>.fl{width:1rem;text-align: right;}
 #detailsView table td>.fright{margin-left: 1.05rem;text-align: left; }
 .lay-mask{position:absolute;background-color: rgba(0,0,0,0.3);z-index: -1;width: 100%;height: 100%;top: 0;left: 0;}
-
 </style>
 <template>
 <section id="detailsView">
 	<div>
+  	    <header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>        
 		<table>
 			<thead>
 				<tr>
@@ -129,6 +129,7 @@
 </template>
 <script>
 import {reqCommonMethodNoLoad} from "../config/service.js";
+import {errorDeal} from "../config/utils.js";
 export default{
 	name:'detailsView',
 	props:{
@@ -139,7 +140,10 @@ export default{
 	data (){
 		return {
 			title:''
-		}
+            ,off:{
+                isLoad:false
+            }
+        }
 	},
 	created:function(){
 		var vm=this;
@@ -173,7 +177,7 @@ export default{
 			// 		style:'width:auto;'
 			// 	});
             // });
-            reqCommonMethodNoLoad({"dealerId":vm.dealerId},"km-ecs/w/audit/getUsersDetail")
+            reqCommonMethodNoLoad({"dealerId":vm.dealerId},function(){vm.off.isLoad=false;},"km-ecs/w/audit/getUsersDetail")
             .then((data)=>{
                 var list= data.data.list;
 				var str='';
@@ -191,10 +195,10 @@ export default{
 					btn:0,
 					style:'width:auto;'
 				});
-            });
+            }).catch(error=>errorDeal(error));
 		},
-		toIncome:function(){
-			var vm=this;
+		toIncome:function(index){
+            var vm=this;
 			// vm.AJAX('w/audit/getIncomeDetail',{"dealerId":vm.dealerId},function(data){
 			// 	var list= data.data;
 			// 	layer.open({
@@ -209,8 +213,9 @@ export default{
 			// 		style:'width:auto;'
 			// 	});
             // });
-            reqCommonMethodNoLoad({"dealerId":vm.dealerId},"km-ecs/w/audit/getIncomeDetail")
-            .then((data)=>{
+            debugger;
+            reqCommonMethodNoLoad({"dealerId":vm.dealerId,"type":index},function(){vm.off.isLoad=false;},"km-ecs/w/audit/getIncomeDetail")
+            .then((data)=>{           
                 var list= data.data;
 				layer.open({
 					content:'<ul class="f-scroll-lt lay-details light">'+
@@ -223,7 +228,7 @@ export default{
 					btn:0,
 					style:'width:auto;'
 				});
-            });            
+            }).catch(error=>errorDeal(error));;            
 		},
 		toCredit:function(index){//激励详情,1\综合激励；2\自推广激励
 			var vm=this,title='';
@@ -247,7 +252,7 @@ export default{
 			// 		style:'width:auto;'
 			// 	});
             // });
-            reqCommonMethodNoLoad({"dealerId":vm.dealerId,"type":index},"km-ecs/w/audit/getCreditDetail")
+            reqCommonMethodNoLoad({"dealerId":vm.dealerId,"type":index},function(){vm.off.isLoad=false;},"km-ecs/w/audit/getCreditDetail")
             .then((data)=>{
                 var list= data.data;
 				layer.open({
@@ -262,7 +267,7 @@ export default{
 					btn:0,
 					style:'width:auto;'
 				});
-            });            
+            }).catch(error=>errorDeal(error));;            
 		},
 		close:function(){
 			var vm=this;

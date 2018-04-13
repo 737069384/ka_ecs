@@ -5,6 +5,8 @@
 * */
 import Vue from "vue";
 import Router from "vue-router";
+import {mapState, mapMutations, mapActions} from 'vuex';
+import {getStore} from '../config/utils';
 Vue.use(Router);
 const load=(isShow)=>{
   var routerLoad=document.getElementById("routerLoading");
@@ -60,6 +62,13 @@ const Audit_registMerchant = resolve => {//激活商户
     load();
   });
 };
+const Audit_applySellArea = resolve => {//申请区域审核
+    load(true);
+    require.ensure(["@/views/km/audit/applySellArea"], () => {
+      resolve(require("@/views/km/audit/applySellArea"));
+      load();
+    });
+  };
 /*订单查询*/
 const OrderSearch = resolve => {
   load(true);
@@ -82,7 +91,7 @@ const OrderSearch_cardItem = resolve => {//开卡订单子模块
     load();
   });
 };
-const OrderSearch_businessPower = resolve => {//售卡范围
+const OrderSearch_businessPower = resolve => {//业务范围
   load(true);
   require.ensure(["@/views/km/orderSearch/businessPower"], () => {
     resolve(require("@/views/km/orderSearch/businessPower"));
@@ -243,7 +252,7 @@ const router=new Router({
     {
         path:"/homey",
         component:Home,
-        redirect:"homey/audit/yuanmeng",
+        // redirect:"homey/audit/yuanmeng",
         children:[{
             path:"audit/:source",
             name:"audit",
@@ -291,9 +300,6 @@ const router=new Router({
     ,{
       path:"/homek",
       component:Home,
-      redirect:"homek/dashboard",
-      // redirect:"home/dashboard",
-      // redirect:"home/audit/card/realtime",
       children:[{
         path:"dashboard",
         component:Dashboard
@@ -323,7 +329,11 @@ const router=new Router({
             path:"registMerchant/:type",
             name:'registMerchantAudit',
             component:Audit_registMerchant,
-          }]
+        },{//激活商户
+            path:"applySellArea",
+            name:'applySellArea',
+            component:Audit_applySellArea,
+        }]
         },
         {//订单查询
           path:"orderSearch",

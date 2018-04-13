@@ -76,10 +76,8 @@ select {
 </div>
 </template>
 <script>
-import { setStore, getStore, createDownload } from "../../config/utils";
+import { setStore, getStore, createDownload ,errorDeal } from "../../config/utils";
 import {reqCommonMethod} from "../../config/service.js";
-require("../../assets/ym/js/laydate/laydate.js");
-require("../../assets/ym/js/laydate/skins/default/laydate.css");
 import pagination from "../ym/page.vue";
 import details from "../ym/searchListDetails.vue";
 import layerForm from "../ym/layerForm.vue";
@@ -143,11 +141,12 @@ export default {
       reqCommonMethod(data,function(){vm.off.isLoad=false;},"ym-ecs/c/audit/dailyAudits")    
       .then((data)=>{
           if(data.code==200){
+            let arr=[];
+              data.data.dailyAudits.sort((a,b)=> parseInt(a.replace(/[^0-9]/ig,"")) > parseInt(b.replace(/[^0-9]/ig,"")) ? 1 : -1);
               vm.downloadDate=data.data.dailyAudits;
           }
-      }).catch(()=>{
-
-      });
+          vm.off.isLoad=false;
+      }).catch(error=>errorDeal(error)); 
       if (initYear >= 2018) {
         for (let i = 2018; i <= initYear; i++) {
           vm.timeyear.push(i + "年");
@@ -167,7 +166,10 @@ export default {
       }, 1000);
     },
     downLoadExcel: function(v) {
+    let userInfo=getStore("KA_ECS_USER");
     var vm = this,url,json={'date':''};
+        json.customerId=userInfo.customerId;
+	    json.codeId=userInfo.codeId;
         url = "ym-ecs/c/audit/downloadDailyAudit";
         v=v.replace(/[^0-9]/ig,"");
         vm.off.load = true;
@@ -221,19 +223,15 @@ export default {
       }
       let date=""+y+m;
       let data={date:date};
-    //   vm.AJAX("c/audit/dailyAudits",data,function(data){
-    //       if(data.code==200){
-    //          vm.downloadDate=data.data.dailyAudits;
-    //       }
-    //   })
+
       reqCommonMethod(data,function(){vm.off.isLoad=false;},"ym-ecs/c/audit/dailyAudits")
       .then((data)=>{
           if(data.code==200){
+            data.data.dailyAudits.sort((a,b)=> parseInt(a.replace(/[^0-9]/ig,"")) > parseInt(b.replace(/[^0-9]/ig,"")) ? 1 : -1);
              vm.downloadDate=data.data.dailyAudits;
           }
-      }).catch(()=>{
-
-      });        
+          vm.off.isLoad=false;          
+      }).catch(error=>errorDeal(error));        
     //   var dn = new Date(),
     //     dny = dn.getFullYear(),
     //     dnm = dn.getMonth() + 1,

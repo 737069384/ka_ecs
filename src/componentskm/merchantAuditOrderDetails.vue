@@ -19,10 +19,15 @@
 						<table class="g-inner-table">
 							<tbody>
 								<tr><td>订单号：</td><td>{{ list.orderId }}</td></tr>
-								<tr><td>申请业务：</td>
-									<td v-if="list.type==3">联通售卡</td>
-									<td v-if="list.type==4">远特售卡</td>
+                               <tr><td>原业务范围：</td>
+									<td><span v-for="x in list.openedScopes">{{x.areas}}(<span v-if="x.type==1">远特售卡</span><span v-if="x.type==2">联通售卡</span><span v-if="x.type==3">移动售卡</span><span v-if="x.type==4">电信售卡</span>)<br></span></td>
 								</tr>
+								<tr><td>申请业务范围:</td><td>
+                                <span v-if="list.operateType==2"><span>{{list.openingArea}}</span>(<span v-if="list.openingType==1">远特售卡</span><span v-if="list.openingType==2">联通售卡</span><span v-if="list.openingType==3">移动售卡</span><span v-if="list.openingType==4">电信售卡</span>)</span>
+                                <span v-if="list.operateType==1"><span v-if="list.openingType==1">远特售卡</span><span v-if="list.openingType==2">联通售卡</span><span v-if="list.openingType==3">移动售卡</span><span v-if="list.openingType==4">电信售卡</span>(<span>{{list.openingArea}}</span>)</span>
+                                </td>
+								</tr>
+                                <tr><td>操作类型:</td><td><span v-if="list.operateType==1">开通权限</span><span v-if="list.operateType==2">扩展区域</span></td></tr>
 								<tr><td>审核状态：</td>
 									<td v-if="list.status==1" class="f-c-yellow">待审核</td>
 									<td v-if="list.status==2" class="f-c-green">通过</td>
@@ -32,10 +37,7 @@
 								<tr v-if="type==2"><td>审核时间：</td><td>{{ $parent.getDateTime(list.modifyTime)[6] }}</td></tr>
 								<tr><td>商户名称：</td><td>{{ list.companyName }}<a href="javascript:void(0)" @click="detailsMerchant" class="details m-l">查看详情</a></td></tr>
 								<tr><td>商户ID：</td><td>{{ list.dealerId }}</td></tr>
-								<tr><td>原业务范围：</td>
-									<td v-if="list.oldType==1">A类远特售卡</td>
-									<td v-if="list.oldType==2">B类联通售卡</td>
-								</tr>
+								
 								<tr><td>申请人姓名：</td><td>{{ list.userName }}</td></tr>
 								<tr><td>申请人ID：</td><td>{{ list.userId }}<a href="javascript:void(0)" @click="detailsUser" class="details m-l">查看详情</a></td></tr>
 								<tr><td>申请人手机号：</td><td>{{ list.userPhone }}</td></tr>
@@ -63,6 +65,7 @@
 <script>
 import "../assets/km/css/cardOrderDetails.css";
 import {reqCommonMethod} from "../config/service.js";
+import {errorDeal} from "../config/utils.js";
 import ImgZoom from '../componentskm/ImgZoom';
 import detailsView from '../componentskm/cardOrderDetailsAlert';
 export default{
@@ -70,7 +73,7 @@ export default{
 	props:{
 		list:Object,
 		type:Number,
-		number:String,
+		number:Number,
 	},
 	data(){
 		return{
@@ -86,7 +89,9 @@ export default{
 	},
 	created:function(){
 		var vm=this;
-		vm.imgData=[{'src':vm.list.img,'name':'手签名'}];
+        vm.imgData=[{'src':vm.list.img,'name':'手签名'}];
+        // vm.imgData=[{'src':"ka_ecs/src/assets/images/admin.png",'name':'手签名qqqq'}];
+        
 	},
 	methods:{
 		close:function(){
@@ -94,18 +99,9 @@ export default{
 		},
 		audit:function(result,reason,cb){//复审同意
 			var vm=this;
-			// vm.AJAX('w/attribute/audit',{"orderId":vm.list.orderId,"result":result,"reason":reason||''},function(data){
-			// 	layer.open({
-		    //         content:'操作成功',
-		    //         skin: 'msg',
-		    //         time: 4,
-		    //         msgSkin:'success',
-		    //     });
-			// 	vm.list.status=result;
-			// 	vm.$parent.list.splice((parseInt(vm.number)+1),1);
-			// 	cb&&cb();
-            // });
-            reqCommonMethod({"orderId":vm.list.orderId,"result":result,"reason":reason||''},function(){vm.off.isLoad=false;},"km-ecs/w/attribute/audit")
+            reqCommonMethod({"orderId":vm.list.orderId,"result":result,"reason":reason||''},function(){
+
+            },"km-ecs/w/attribute/audit")
             .then((data)=>{
                 layer.open({
 		            content:'操作成功',
@@ -113,10 +109,11 @@ export default{
 		            time: 4,
 		            msgSkin:'success',
 		        });
-				vm.list.status=result;
-				vm.$parent.list.splice((parseInt(vm.number)+1),1);
+                vm.list.status=result;
+				vm.$parent.searchList(2);
+				vm.$parent.off.details=false;
 				cb&&cb();
-            })            
+            }).catch(error=>errorDeal(error));            
 		},
 		refuse:function(){
 			var vm=this,ww=window.innerWidth,wwSet,popIndex;
@@ -148,7 +145,7 @@ export default{
                 vm.detailsList=data.data;
 				vm.isShowDetails=true;
 				vm.typeDetails=1;
-            });            
+            }).catch(error=>errorDeal(error));;            
 		},
 		detailsMerchant:function(){//商户详情
 			var vm=this;
@@ -162,7 +159,7 @@ export default{
                 vm.detailsList=data.data;
 				vm.isShowDetails=true;
 				vm.typeDetails=2;
-            });            
+            }).catch(error=>errorDeal(error));;            
 		},
 	}
 }

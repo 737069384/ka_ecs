@@ -54,7 +54,7 @@
 					<td>{{todo.creditOriginal}}</td>
 					<td class="fRed">{{todo.creditAlready}}</td>
 					<td>{{todo.creditRemain}}</td>
-					<th v-if="off.power5" colspan="2"><input  maxlength="15" class="active" name="" type="text" placeholder="请输入要兑换的积分"><button class="btnPoints" @click="openinput('ex')" >兑换</button></th>
+					<th colspan="2"><input  maxlength="15" class="active" name="" type="text" placeholder="请输入要兑换的积分"><button class="btnPoints" @click="openinput('ex')" >兑换</button></th>
 				</tr>
 			</tbody>
 		</table>
@@ -65,12 +65,10 @@
   </div>
 </template>
 <script>
-require("../../assets/ym/js/laydate/laydate.js");
-require("../../assets/ym/js/laydate/skins/default/laydate.css");
 import pagination from "../ym/page.vue";
 import details from "../ym/searchListDetails.vue";
 import layerForm from '../ym/layerForm.vue'
-import {setStore, getStore, createDownload} from '../../config/utils';
+import {setStore, getStore, createDownload,errorDeal} from '../../config/utils';
 import {reqCommonMethod} from "../../config/service.js";
 import axios from 'axios';
 export default{
@@ -137,9 +135,10 @@ export default{
              const vm=this;
 	  let userInfo=getStore("KA_ECS_USER");
 	  vm.userInfo=userInfo;
-      vm.userInfo.isadmin&&(vm.userInfo.isadmin.indexOf('1')>-1||vm.userInfo.isadmin.indexOf('5')>-1) ? vm.off.power5=true : vm.off.power5=false;
-			vm.form.startTime=laydate.now(0,'YYYY-MM-DD 00:00:00');
-			vm.form.endTime=laydate.now(0,'YYYY-MM-DD 23:59:59');
+      vm.userInfo.isadmin.indexOf('5')>-1?vm.off.power5=true : vm.off.power5=false;
+      vm.userInfo.isadmin.indexOf('1')>-1?vm.off.power1=true : vm.off.power1=false;
+      vm.form.startTime=laydate.now(0,'YYYY-MM-DD 00:00:00');
+	  vm.form.endTime=laydate.now(0,'YYYY-MM-DD 23:59:59');
 		},
 		to_laydate:function(v){
 			var vm=this,el='';
@@ -169,7 +168,6 @@ export default{
 		    vm.ydh = parseInt(theData.creditAlready);
 			vm.dh = parseInt(theBtn.parentNode.firstChild.value);
             if(v=="ex"){
-                debugger;
                  if(!isNaN(vm.dh)){
 				   if(vm.dh==''){
 						layer.open({
@@ -275,10 +273,9 @@ export default{
 			            vm.off.getPoints='1';	
 					}else{
 						return false;
-					}
-                }).catch(()=>{
-
-                });                
+                    }
+                    vm.off.isLoad=false;
+                }).catch(error=>errorDeal(error));                   
 			}
 		}
 	}

@@ -21,6 +21,7 @@
             <div class="row">
               <span class="dp">问题类型：</span>
               <div class="m-form-radio">
+                <label><span class="radio"><input value="0" type="radio" v-model="form.orderType"><span></span></span><span class="text">全部</span></label>
                 <label><span class="radio"><input value="1" type="radio" v-model="form.orderType"><span></span></span><span class="text">功能异常</span></label>
                 <label ><span class="radio"><input value="2" type="radio" v-model="form.orderType"><span></span></span><span class="text">其他问题</span></label>
               </div>
@@ -115,10 +116,9 @@
   </section>
 </template>
 <script>
-  require("../../../assets/km/js/laydate/laydate.js");
-  require("../../../assets/km/js/laydate/skins/default/laydate.css");
-  import {reqCommonMethod} from "../../../config/service.js";  
-  import pagination from "../../../componentskm/Page.vue";
+  import {reqCommonMethod} from "../../../config/service.js";
+  import {errorDeal} from "../../../config/utils.js";  
+  import pagination from "../../../componentskm/page.vue";
   import details from "../../../componentskm/opinionDetails.vue";
   import {createDownload} from '../../../config/utils';
   import "../../../assets/km/css/search.css";
@@ -135,7 +135,7 @@
           whichBtn:'',
         },
         form:{
-          orderType:1,//1功能异常;2其他问题;
+          orderType:0,//0全部;1功能异常;2其他问题;
           context1:'',//反馈单号
           context2:'',//商户ID
           context3:'',//手机号码
@@ -275,9 +275,7 @@
             vm.maxpage=Math.ceil(parseInt(data.data.total)/10);//最大页码
             vm.pageNum=page||1;
             vm.callback=function(v){vm.searchList(index,v)};
-        }).then(()=>{
-            vm.off.isLoad=false;
-        });  
+        }).catch(error=>errorDeal(error)); 	  
         }
       }
       //按钮
@@ -299,10 +297,9 @@
             vm.detailsData=data.data.details;
             vm.detailsData.content = BASE64.decode(vm.detailsData.content);
             vm.detailsLog=data.data.process;
-            vm.detailsData?vm.off.details=true:vm.off.details=false;          
-        }).then(()=>{
-            vm.off.isLoad=false;
-        });        
+            vm.detailsData?vm.off.details=true:vm.off.details=false; 
+            vm.off.isLoad=false;         
+        }).catch(error=>errorDeal(error)); 	        
       }
       ,to_laydate:function(v){
         var vm=this;

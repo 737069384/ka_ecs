@@ -11,6 +11,9 @@
 .g-search-menu #search #auditList {
   display: block;
 }
+.m-sub-page>.fl{
+	padding: 20px;
+}
 </style>
 <template>
   <div id="search" :class="{active:off.details}">
@@ -238,11 +241,14 @@
 				</tr>
 			</tbody>
 		</table>
-		<my-page :page="pageNum" :maxpage="maxpage" :callback="callback"></my-page>
-		<div v-if="form.orderStatus==4&&list.length" class="o-export-excel">
-			<a href="javascript:void(0)" @click="downloadBugOrder" class="f-btn-success">导出全部数据</a>
-			<iframe src="" frameborder="0" id="downloadFrame" style="width:0;height:0;opacity:0"></iframe>
-		</div>
+		<section class="m-sub-page clr">
+			<div v-if="form.orderStatus==4&&list.length" class="o-export-excel fl">
+				<a href="javascript:void(0)" @click="downloadBugOrder" class="f-btn-success">导出准同意数据</a>
+				<iframe src="" frameborder="0" id="downloadFrame" style="width:0;height:0;opacity:0"></iframe>
+			</div>
+			<my-page :page="pageNum" :maxpage="maxpage" :callback="callback"></my-page>
+		</section>
+		
 	</div>
 	</section>
 	<!--详情-->
@@ -255,12 +261,10 @@
   </div>
 </template>
 <script>
-require("../../assets/ym/js/laydate/laydate.js");
-require("../../assets/ym/js/laydate/skins/default/laydate.css");
-import pagination from "../ym/page.vue";
+import pagination from "../../componentskm/page.vue";
 import details from "../ym/searchListDetails.vue";
 import auditdetails from "../ym/auditList.vue";
-import { setStore, getStore, createDownload } from "../../config/utils";
+import { setStore, getStore, createDownload,errorDeal } from "../../config/utils";
 import {reqCommonMethod} from "../../config/service.js";
 export default {
   name: "search",
@@ -320,10 +324,9 @@ export default {
       const vm=this;
       let userInfo=getStore("KA_ECS_USER");
 	  vm.userInfo=userInfo;
-      vm.userInfo.isadmin&&(vm.userInfo.isadmin.indexOf('1')>-1||vm.userInfo.isadmin.indexOf('3')>-1) ? vm.off.power3=true : vm.off.power3=false;
+      vm.userInfo.isadminYm&&(vm.userInfo.isadminYm.indexOf('1')>-1||vm.userInfo.isadminYm.indexOf('3')>-1) ? vm.off.power3=true : vm.off.power3=false;
       var type = this.$route.params.type;
       type == "auditing" ? (vm.off.type = 1) : (vm.off.type = 2);
-      debugger;
       vm.form.startTime = laydate.now(0, "YYYY-MM-DD 00:00:00");
       vm.form.endTime = laydate.now(0, "YYYY-MM-DD 23:59:59");
       vm.off.type == 1 ? (vm.form.select = 5) : (vm.form.select = 7);
@@ -418,8 +421,6 @@ export default {
       vm.off.type == 1
         ? (url = "ym-ecs/c/audit/auditOrderSearch")
         : (url = "ym-ecs/c/audit/orderSearch");
-      if (vm.off.isLoad) return false;
-      vm.off.isLoad = true;
     //   vm.AJAX(url,json,function(data) {
     //       vm.list = data.data.list;
     //       vm.total = data.data.total;
@@ -433,8 +434,9 @@ export default {
     //       vm.off.isLoad = false;
     //     }
     //   );
-      reqCommonMethod(json,function(){vm.off.isLoad=false;},url)
-      .then((response)=>{
+      vm.off.isLoad=true;
+      reqCommonMethod(json,function(){vm.off.isLoad=false},url)
+      .then((data)=>{
           vm.list = data.data.list;
           vm.total = data.data.total;
           vm.maxpage = Math.ceil(parseInt(data.data.total) / 10);
@@ -442,11 +444,8 @@ export default {
           vm.callback = function(v) {
             vm.searchList(index, v);
           };
-      }).then(()=>{
-           vm.off.isLoad = false;
-      }).catch(()=>{
-
-      })
+          vm.off.isLoad=false;
+      }).catch(error=>errorDeal(error));    
     },
     downLoadList: function(index, page) {
       //导出EXCEL
@@ -545,6 +544,9 @@ export default {
         url = "ym-ecs/c/audit/downloadOrderSearch";
       }
       vm.off.load = true;
+      let userInfo=getStore("KA_ECS_USER");
+      json.customerId=userInfo.customerId;
+	  json.codeId=userInfo.codeId;
       createDownload(url, JSON.stringify(json), function() {
         vm.off.load = false;
       });
@@ -552,11 +554,18 @@ export default {
     downloadBugOrder() {
       //下载准同意excel
       var vm = this;
-      vm.AJAX("ym-ecs/c/audit/exportBuggingOrder",{startTime: vm.form.startTime,endTime: vm.form.endTime,cardStatus: vm.form.context7},function(data) {
-          var frame = document.getElementById("downloadFrame");
-          frame.setAttribute("src", data.data.exportUrl);
-        }
-      );     
+
+      vm.off.load = true;
+      let userInfo=getStore("KA_ECS_USER"),json={
+      	startTime: vm.form.startTime,
+      	endTime: vm.form.endTime,
+      	cardStatus: vm.form.context7,
+      	customerId:userInfo.customerId,
+	  	codeId:userInfo.codeId
+      };
+      createDownload("ym-ecs/c/audit/exportBuggingOrder", JSON.stringify(json), function() {
+        vm.off.load = false;
+      });
     },
     agree: function(e) {
       var vm = this,
@@ -583,9 +592,8 @@ export default {
             });
             vm.list[number].result = 3;
             vm.list[number].cardStatus = 1;
-      }).catch(()=>{
-
-      });      
+            vm.off.isLoad=false;
+      }).catch(error=>errorDeal(error));         
     },
     details: function(e) {
       var vm = this,
@@ -610,13 +618,12 @@ export default {
     //     }
     //   );
       reqCommonMethod({ orderId: orderId },function(){vm.off.isLoad=false;},url)
-      .then((response)=>{
+      .then((data)=>{
           vm.detailsData = data.data;
           vm.off.details = true;
           vm.off.detailsList = true;
-      }).catch(()=>{
-
-      });      
+          vm.off.isLoad=false;
+      }).catch(error=>errorDeal(error));          
     },
     to_laydate: function(v) {
       var vm = this,

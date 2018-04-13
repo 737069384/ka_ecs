@@ -28,7 +28,7 @@
 						<th>激活时间</th>
 						<th>推广方</th>
 						<th>绑定商户</th>
-						<th>售卡范围</th>
+						<th>业务范围</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -43,20 +43,21 @@
 						<td>{{ todo.createTime }}</td>
 						<td>{{ todo.activationTime }}</td>
 						<td>
-							<a :href="'#/home/resource/promoter/'+todo.protomerDealerId" title="点击查看详情" class="details">{{todo.protomerDealerId}}</a><br/>
+							<a :href="'#/homek/resource/promoter/'+todo.protomerDealerId" title="点击查看详情" class="details">{{todo.protomerDealerId}}</a><br/>
 							<span v-show="todo.protomerName">（{{todo.protomerName}}）</span></td>
 						<td>
 							<span v-if="todo.merchantDealerId!='null'">
-								<a :href="'#/home/resource/merchant/'+todo.merchantDealerId" title="点击查看详情" class="details">{{todo.merchantDealerId}}</a><br/>
+								<a :href="'#/homek/resource/merchant/'+todo.merchantDealerId" title="点击查看详情" class="details">{{todo.merchantDealerId}}</a><br/>
 								<span>（{{todo.merchantName}}）</span>
 							</span>
 							<span v-else class="f-c-red">未绑定</span>
 						</td>
 						<td>
-							<span v-show="todo.businessPower==1">A（远特售卡）</span>
-							<span v-show="todo.businessPower==2">B（联通售卡）</span>
-							<span v-show="todo.businessPower==3">C（远特售卡+联通售卡）</span>
-							<span v-show="todo.businessPower==4">D（联通售卡+远特售卡）</span>
+							<span v-show="todo.isp==1">远特</span>
+							<span v-show="todo.isp==2">联通</span>
+							<span v-show="todo.isp==3">移动</span>
+							<span v-show="todo.isp==4">电信</span>
+							<span>（{{ todo.area }}）</span>
 						</td>
 					</tr>
 				</tbody>
@@ -90,7 +91,6 @@ export default{
 		searchClick(){
 			var vm=this;
 			if(vm.off.isLoad)return false;
-			
 			vm.deviceList=[];
 			if(!vm.form.deviceNumber){
 				layer.open({
@@ -101,7 +101,7 @@ export default{
 		        });
 		        return false;
 			}
-			vm.off.isLoad=true;
+			// vm.off.isLoad=true;
 			unifySearchApi({
 					"opKey":"info.device.search",
 					"params":["'"+vm.form.deviceNumber+"'"],
@@ -120,7 +120,6 @@ export default{
 			            msgSkin:'error',
 			        });
 				}
-				
 			});
 		},
 		getDateTime(v){

@@ -14,7 +14,7 @@ export const errorDeal=(res,cb)=>{
             layer.closeAll();
         }
     }),store.commit("CLEAR_TIMER")) : layer.open({
-        content:res.msg||res.statusText||res,
+        content:res.msg||res.statusText||res.message||res,
         skin: 'msg',
         time: 4,
         msgSkin:'error',
@@ -34,16 +34,16 @@ export const createDownload=(url,data,cb)=>{
     	ifr.setAttribute("name","downLoadForm");
     	ifr.setAttribute("style","display:none");
     }
+    cb();
     ifr.addEventListener("load",function(e){
-    	cb();
     	try{
             var res = ifr.contentWindow.document.body.textContent;
-            if(res!=''&&res.hasOwnProperty('code')){
+            if(res!=''&&res.indexOf('code')>-1){
                var result=JSON.parse(res);
                if(res.code!=200){
-                  errorDeal(res);
-               } 
-            };	
+                  errorDeal(result);
+               }
+            }
     	}catch(error){
     		errorDeal(error);
     	}

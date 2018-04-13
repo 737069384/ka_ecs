@@ -55,6 +55,7 @@
 </template>
 <script>
 import {reqCommonMethod} from "../../../config/service.js";
+import {errorDeal} from "../../../config/utils.js";
 export default{
 	data (){
 		return {
@@ -92,12 +93,12 @@ export default{
             // })
             reqCommonMethod({"phone":vm.form.phone},function(){vm.off.isLoad=false;},"km-ecs/w/frozen/getPhone")
             .then((data)=>{
-                if(typeof data==object){
+                console.log(typeof data)
+                if(typeof data=='object'){
                     vm.phoneList=data.data;
                 }
-            }).catch(()=>{
                 vm.off.isLoad=false;
-            })
+            }).catch(error=>errorDeal(error)); 	
 		},
 		phoneRelease(){//解冻
 			var vm=this;
@@ -123,9 +124,8 @@ export default{
                     msgSkin:'success',
                 });
                 vm.searchPhone();
-            }).catch(()=>{
                 vm.off.isLoad=false;
-            })
+            }).catch(error=>errorDeal(error)); 	
 		},
 		phoneOccupy(){//占用
 			var vm=this;
@@ -150,10 +150,9 @@ export default{
 		            time: 4,
 		            msgSkin:'success',
 		        });
-	            vm.searchPhone();
-            }).then(()=>{
+                vm.searchPhone();
                 vm.off.isLoad=false;
-            });            
+            }).catch(error=>errorDeal(error)); 	           
 		}
 	}
 };

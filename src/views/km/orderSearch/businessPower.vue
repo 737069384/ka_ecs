@@ -56,7 +56,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<span class="dp">申请业务：</span>
+				<span class="dp">业务范围：</span>
 				<div class="m-form-radio">
 					<label><span class="radio"><input type="radio" value="0" v-model="form.type"><span></span></span><span class="text">全部</span></label>
 					<label><span class="radio"><input type="radio" value="4" v-model="form.type"><span></span></span><span class="text">远特售卡</span></label>
@@ -69,6 +69,14 @@
 					<label><span class="radio"><input type="radio" value="0" v-model="form.status"><span></span></span><span class="text">全部</span></label>
 					<label><span class="radio"><input type="radio" value="2" v-model="form.status"><span></span></span><span class="text">通过</span></label>
 					<label><span class="radio"><input type="radio" value="3" v-model="form.status"><span></span></span><span class="text">拒绝</span></label>
+				</div>
+			</div>
+            <div class="row">
+				<span class="dp">操作类型：</span>
+				<div class="m-form-radio">
+					<label><span class="radio"><input type="radio" value="0" v-model="form.opType"><span></span></span><span class="text">全部</span></label>
+					<label><span class="radio"><input type="radio" value="1" v-model="form.opType"><span></span></span><span class="text">开通权限</span></label>
+					<label><span class="radio"><input type="radio" value="2" v-model="form.opType"><span></span></span><span class="text">扩展区域</span></label>
 				</div>
 			</div>
 			<button class="f-btn f-btn-line" @click="searchList(2)">查询</button>
@@ -101,7 +109,8 @@
 					<th>商户名称</th>
 					<th>商户ID</th>
 					<th>申请人</th>
-					<th>申请业务</th>
+					<th>业务范围</th>
+					<th>操作类型</th>
 					<th>申请时间</th>
 					<th></th>
 				</tr>
@@ -111,7 +120,8 @@
 					<th>商户名称</th>
 					<th>商户ID</th>
 					<th>申请人</th>
-					<th>申请业务</th>
+					<th>业务范围</th>
+                    <th>操作类型</th>
 					<th>申请时间</th>
 					<th>审核人</th>
 					<th>审核时间</th>
@@ -121,30 +131,42 @@
 			</thead>
 			<tbody>
 				<!--待审核-->
-				<tr v-if="off.type==1" v-for="(todo,index) in list">
+				<tr v-if="off.type==1" v-for="(todo,index) in list" :key="index">
 					<td>{{ (pageNum-1)*pageSize+(index+1) }}</td>
 					<td>{{ todo.orderId }}</td>
 					<td>{{ todo.companyName }}</td>
 					<td>{{ todo.dealerId }}</td>
 					<td>{{ todo.userId }}<br/>（{{ todo.userName }}）</td>
 					<td>
-						<span v-if="todo.type==3">联通售卡</span>
-						<span v-if="todo.type==4">远特售卡</span>
+						<span v-if="todo.openingType==2">联通售卡<span>({{todo.openingArea}})</span></span>
+						<span v-if="todo.openingType==1">远特售卡<span>({{todo.openingArea}})</span></span>
+						<span v-if="todo.openingType==3">移动售卡<span>({{todo.openingArea}})</span></span>
+						<span v-if="todo.openingType==4">电信售卡<span>({{todo.openingArea}})</span></span>
 					</td>
+					<td>
+                        <span v-if="todo.operateType==1">开通权限</span>
+                        <span v-if="todo.operateType==2">扩展区域</span>
+                    </td>
 					<td>{{ getDateTime(todo.createTime)[6] }}</td>
 					<td><a :name="todo.orderId" @click="details" href="javascript:void(0)" class="details">详情</a></td>
 				</tr>
 				<!--已审核-->
-				<tr v-if="off.type==2" v-for="(todo,index) in list">
+				<tr v-if="off.type==2" v-for="(todo,index) in list" :key="index">
 					<td>{{ (pageNum-1)*pageSize+(index+1) }}</td>
 					<td>{{ todo.orderId }}</td>
 					<td>{{ todo.companyName }}</td>
 					<td>{{ todo.dealerId }}</td>
 					<td>{{ todo.userId }}<br/>（{{ todo.userName }}）</td>
 					<td>
-						<span v-if="todo.type==3">联通售卡</span>
-						<span v-if="todo.type==4">远特售卡</span>
+						<span v-if="todo.openingType==2">联通售卡<span>({{todo.openingArea}})</span></span>
+						<span v-if="todo.openingType==1">远特售卡<span>({{todo.openingArea}})</span></span>
+						<span v-if="todo.openingType==3">移动售卡<span>({{todo.openingArea}})</span></span>
+						<span v-if="todo.openingType==4">电信售卡<span>({{todo.openingArea}})</span></span>
 					</td>
+                    <td>
+                        <span v-if="todo.operateType==1">开通权限</span>
+                        <span v-if="todo.operateType==2">扩展区域</span>
+                    </td>
 					<td>{{ getDateTime(todo.createTime)[6] }}</td>
 					<td>{{ todo.customerId }}<br/>（{{ todo.customerName }}）</td>
 					<td>{{ getDateTime(todo.modifyTime)[6] }}</td>
@@ -175,10 +197,9 @@
 </template>
 <script>
 import "../../../assets/km/css/search.css";
-require("../../../assets/km/js/laydate/laydate.js");
-require("../../../assets/km/js/laydate/skins/default/laydate.css");
 import {reqCommonMethod} from "../../../config/service.js";
-import pagination from "../../../componentskm/Page.vue";
+import {errorDeal} from "../../../config/utils.js";
+import pagination from "../../../componentskm/page.vue";
 import details from "../../../componentskm/merchantAuditOrderDetails.vue";
 import { getDateTime } from "../../../config/utils.js";
 export default{
@@ -187,18 +208,20 @@ export default{
 			off:{
 				type:1,//1，待审核；2，已审核
 				isLoad:0,//加载条
-				details:0,//详情页面开关
+                details:0,//详情页面开关
+                number:'',
 			},
 			form:{
 				orderId:'',//订单号码
 				status:0,//订单状态
-				type:0,//申请业务
+				type:0,//业务范围
 				customerPhone:'',//审核人ID
 				dealerId:'',//商户号
 				userPhone:'',//申请人ID
 				startTime:'',
 				endTime:'',
-				select:6,//条件查询，选择的条件
+                select:6,//条件查询，选择的条件
+                opType:0,//操作类型
 			},
 			list:'',//列表数据
 			detailsData:'',//详情数据
@@ -224,7 +247,7 @@ export default{
 			vm.form.endTime=laydate.now(0,'YYYY-MM-DD 23:59:59');
 		},
 		searchList(index,page){//充值订单
-			var vm=this,url,json={"pageSize":vm.pageSize,"pageNum":page||1,"startTime":vm.form.startTime,"endTime":vm.form.endTime,"status":vm.form.status,'type':vm.form.type,'orderId':'','customerPhone':vm.form.customerPhone,'dealerId':'','userPhone':''};
+			var vm=this,url,json={"pageSize":vm.pageSize,"pageNum":page||1,"startTime":vm.form.startTime,"endTime":vm.form.endTime,"operateType":vm.form.opType,"status":vm.form.status,'type':vm.form.type,'orderId':'','customerPhone':vm.form.customerPhone,'dealerId':'','userPhone':''};
 			if(index=='order'){
 				if(vm.form.orderId.length==0){
 					layer.open({
@@ -280,14 +303,13 @@ export default{
             // });
             reqCommonMethod(json,function(){vm.off.isLoad=false;},"km-ecs/w/attribute/search")
             .then((data)=>{
-	            vm.list=data.data.list;
+                vm.list=data.data.list;
 				vm.total=data.data.total;
 				vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
 				vm.pageNum=page||1;
-				vm.callback=function(v){vm.searchList(index,v)};
-            }).catch(()=>{
-                vm.off.isLoad=false;
-            })
+                vm.callback=function(v){vm.searchList(index,v)};
+                vm.off.isLoad=false
+            }).catch(error=>errorDeal(error)); 	
 		},
 		details:function(e){//详情
 			var vm=this,url,orderId=e.target.name;
@@ -302,11 +324,15 @@ export default{
             // });
              reqCommonMethod({"orderId":orderId},function(){vm.off.isLoad=false;},"km-ecs/w/attribute/detail")
              .then((data)=>{
-	            vm.detailsData=data.data;
-				vm.off.details=true;
-             }).catch(()=>{
+                vm.detailsData=data.data;
+                for(let i=0;i<vm.list.length;i++){
+                    if(vm.list[i].orderId==orderId){
+                        vm.off.number=i;
+                    }
+                };
+                vm.off.details=true;
                 vm.off.isLoad=false;
-             })
+             }).catch(error=>errorDeal(error)); 	
 		},
 		downLoadList:function(){//导出EXCEL
 			var vm=this,json={"startTime":vm.form.startTime,"endTime":vm.form.endTime,"status":vm.form.status,'type':vm.form.type,'orderId':'','customerPhone':vm.form.customerPhone,'dealerId':vm.form.dealerId,'userPhone':vm.form.userPhone};

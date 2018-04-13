@@ -26,8 +26,10 @@
 						<th>创建时间</th>
 						<th>创建人</th>
 						<th>推广码</th>
+						
 						<th>号码模式</th>
 						<th>折扣模式</th>
+						<th>转账模式</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -37,14 +39,9 @@
 						<td>{{ getDateTime(promoterData.createTime)[6] }}</td>
 						<td>{{ promoterData.modifyUser||'--' }}</td>
 						<td>{{ promoterData.referralCode||'--' }}</td>
-						<td>{{promoterData.phoneModel}}
-							<!-- <b v-if="promoterData.phoneModel=='basemodel'||promoterData.phoneModel==''">基本模式</b>
-							<b v-else>其它模式</b> -->
-						</td>
-						<td>{{promoterData.discountModel}}
-							<!-- <b v-if="promoterData.discountModel=='basemodel'||promoterData.discountModel==''">基本模式</b>
-							<b v-else>其它模式</b> -->
-						</td>
+						<td>{{ promoterData.phoneModel }}</td>
+						<td>{{ promoterData.discountModel }}</td>
+						<td>{{ promoterData.transterModel }}</td>
 					</tr>
 				</tbody>
 			</table>
@@ -58,7 +55,7 @@
 						<th>设备编号</th>
 						<th>激活状态</th>
 						<th>MAC地址</th>
-						<th>售卡范围</th>
+						<th>业务范围</th>
 						<th>创建时间</th>
 						<th>激活时间</th>
 					</tr>
@@ -66,17 +63,18 @@
 				<tbody>
 					<tr v-for="(todo,index) in deviceList">
 						<td>{{((devicePageParam.pageNum-1)*10+(index+1))}}</td>
-						<td><a :href="'#/home/resource/device/'+todo.deviceNumber" title="点击查看详情" class="details m-l">{{todo.deviceNumber}}</a></td>
+						<td><a :href="'#/homek/resource/device/'+todo.deviceNumber" title="点击查看详情" class="details m-l">{{todo.deviceNumber}}</a></td>
 						<td>
 							<span class="f-c-green" v-show="todo.state==1">已激活</span>
 							<span class="f-c-red" v-show="todo.state==0">未激活</span>
 						</td>
 						<td>{{ todo.mac }}</td>
 						<td>
-							<span v-show="todo.businessPower==1">A（远特售卡）</span>
-							<span v-show="todo.businessPower==2">B（联通售卡）</span>
-							<span v-show="todo.businessPower==3">C（远特售卡+联通售卡）</span>
-							<span v-show="todo.businessPower==4">D（联通售卡+远特售卡）</span>
+							<span v-show="todo.isp==1">远特</span>
+							<span v-show="todo.isp==2">联通</span>
+							<span v-show="todo.isp==3">移动</span>
+							<span v-show="todo.isp==4">电信</span>
+							<span>（{{ todo.area }}）</span>
 						</td>
 						<td>{{ todo.createTime }}</td>
 						<td>{{ todo.activationTime }}</td>
@@ -95,7 +93,7 @@
 						<th>网点名称</th>
 						<th>总部推广渠道</th>
 						<th>商户类型</th>
-						<th>售卡范围</th>
+						<th>业务范围</th>
 						<th>签约状态</th>
 						<th>创建时间</th>
 					</tr>
@@ -104,7 +102,7 @@
 					<tr v-for="(todo,index) in merchantList">
 						<td>{{((merchantPageParam.pageNum-1)*10+(index+1))}}</td>
 						<td>
-							<a :href="'#/home/resource/merchant/'+todo.dealerId" title="点击查看详情" class="details m-l">{{todo.dealerId}}</a>
+							<a :href="'#/homek/resource/merchant/'+todo.dealerId" title="点击查看详情" class="details m-l">{{todo.dealerId}}</a>
 						</td>
 						<td>{{ todo.companyName }}</td>
 						<td>
@@ -117,10 +115,10 @@
 							<span v-show="todo.merchantType==2">个人</span>
 						</td>
 						<td>
-							<span v-show="todo.businessPower==1">A（远特售卡）</span>
-							<span v-show="todo.businessPower==2">B（联通售卡）</span>
-							<span v-show="todo.businessPower==3">C（远特售卡+联通售卡）</span>
-							<span v-show="todo.businessPower==4">D（联通售卡+远特售卡）</span>
+							<div v-show="todo.t1!='null'">远特（{{ todo.t1 }}）</div>
+							<div v-show="todo.t2!='null'">联通（{{ todo.t2 }}）</div>
+							<div v-show="todo.t3!='null'">移动（{{ todo.t3 }}）</div>
+							<div v-show="todo.t4!='null'">电信（{{ todo.t4 }}）</div>
 						</td>
 						<td>
 							<span class="f-c-green" v-show="todo.isSignAgreement==1">已签约</span>
@@ -135,7 +133,7 @@
 	</div>
 </template>
 <script>
-import pagination from "../../../componentskm/Page.vue";
+import pagination from "../../../componentskm/page.vue";
 import { getDateTime } from "../../../config/utils.js";
 import { unifySearchApi } from '../../../config/service';
 export default{
@@ -178,9 +176,6 @@ export default{
 		searchClick(){
 			var vm=this;
 			if(vm.off.isLoad)return false;
-			
-			vm.promoterData={};
-			vm.deviceList=[];
 			if(!vm.form.dealerId){
 				layer.open({
 		            content:'请输入查询的推广方ID',
@@ -191,6 +186,9 @@ export default{
 		        return false;
 			}
 			vm.off.isLoad=true;
+			vm.promoterData={};
+			vm.deviceList=[];
+			vm.merchantList=[];
 			unifySearchApi({
 					"opKey":"info.promoter.search",
 					"params":["'"+vm.form.dealerId+"'"],
@@ -210,8 +208,7 @@ export default{
 			            msgSkin:'error',
 			        });
 				}
-				
-			});
+            });
 		},
 		getDeviceList(page,dealerId){
 			var vm=this;
@@ -231,7 +228,8 @@ export default{
 					pageNum:page||1,
 					callback:function(v){vm.getDeviceList(v,dealerId)}
 				}
-				vm.getMerchantList(1,dealerId)
+                vm.getMerchantList(1,dealerId);
+				vm.off.isLoad=false;                
 			});
 		},
 		getMerchantList(page,dealerId){
