@@ -66,7 +66,7 @@ table.g-inner-table tbody tr td:first-child{
 import "../../../assets/km/css/cardOrderDetails.css";
 import "../../../assets/km/css/audit.css";
 import {reqCommonMethod} from "../../../config/service.js";
-import {errorDeal} from "../../../config/utils.js";
+import {errorDeal,imgUrlDeal} from "../../../config/utils.js";
 import ImgZoom from '../../../componentskm/ImgZoom';
 import detailsView from '../../../componentskm/cardOrderDetailsAlert';
 
@@ -98,15 +98,14 @@ export default{
 	},
 	created:function(){
 		var vm=this;
-        // vm.imgData=[{'src':"ka_ecs/src/assets/images/admin.png",'name':'手签名qqqq'}];
         vm.getAuditList();
-        vm.imgData=[{'src':vm.auditData.img,'name':'手签名'}];
+        vm.imgData=[{'src':imgUrlDeal(vm.auditData.img),'name':'手签名'}];
 	},
 	methods:{
           getAuditList:function(){//获取订单
 			let vm=this,url='km-ecs/w/attribute/auditList';
 			// if(vm.off.isLoad==1){return false};
-			// vm.off.isLoad=1;
+			vm.off.isLoad=1;
             reqCommonMethod({},function(){vm.off.isLoad=false;},url)
             .then((data)=>{
                 if(data.data.length==0){
@@ -131,14 +130,12 @@ export default{
 			vm.auditData='';
 			if(len&&(vm.off.auditIndex+1)<=len){
 				vm.auditData=vm.list[vm.off.auditIndex];
-                vm.imgData=[
-                    {'src':vm.auditData.img,'name':'手签名'},
-                ];
+                vm.imgData=[{'src':imgUrlDeal(vm.auditData.img),'name':'手签名'},];
 				vm.off.auditIndex++;
 			}
 		},agree:function(){//审核同意
 			var vm=this,url='km-ecs/w/attribute/audit';	
-            reqCommonMethod({"orderId":vm.auditData.orderId,"result":2,reason:""},function(){vm.off.isLoad=false;},url)
+            reqCommonMethod({"orderId":vm.auditData.orderId,"result":2,reason:""},false,url)
             .then((data)=>{
                 layer.open({
                     content:data.msg,
@@ -152,9 +149,8 @@ export default{
             }).catch(error=>errorDeal(error));             
         },
         audit:function(result,reason,cb){//复审同意
-            debugger;
 			var vm=this;
-            reqCommonMethod({"orderId":vm.auditData.orderId,"result":result,"reason":reason||''},function(){vm.off.isLoad=false;},"km-ecs/w/attribute/audit")
+            reqCommonMethod({"orderId":vm.auditData.orderId,"result":result,"reason":reason||''},false,"km-ecs/w/attribute/audit")
             .then((data)=>{
                 layer.open({
 		            content:'操作成功',
@@ -257,7 +253,7 @@ export default{
 			},1000);
 		},detailsUser:function(){//申请人详情
 			var vm=this;
-            reqCommonMethod({"userId":vm.auditData.userId},function(){vm.$parent.off.isLoad=false;},"km-ecs/w/audit/getUserInfo")
+            reqCommonMethod({"userId":vm.auditData.userId},false,"km-ecs/w/audit/getUserInfo")
             .then((data)=>{
                 vm.detailsList=data.data;
 				vm.isShowDetails=true;
@@ -266,7 +262,7 @@ export default{
 		},
 		detailsMerchant:function(){//商户详情
 			var vm=this;
-            reqCommonMethod({"dealerId":vm.auditData.dealerId},function(){vm.$parent.off.isLoad=false;},"km-ecs/w/audit/getMerchantInfo")
+            reqCommonMethod({"dealerId":vm.auditData.dealerId},false,"km-ecs/w/audit/getMerchantInfo")
             .then((data)=>{
                 vm.detailsList=data.data;
 				vm.isShowDetails=true;

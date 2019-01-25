@@ -7,6 +7,7 @@
   <section class="g-search-menu">
     <div id="search" :class="{active:off.details}">
       <header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+      <section class="m-occlusion" :class="{active:off.isLoad}"></section>
       <!--查询-->
       <section v-if="!off.details">
         <div class="g-search-form">
@@ -14,8 +15,7 @@
           <!--订单号码查询-->
           <section class="form-c">
             <div class="row clr m-col-2">
-              <span class="dp col-l">订单号码：</span>
-              <div class="col-r m-input-button"><input v-model="form.context1" maxlength="32" type="tel" placeholder="请输入查询的订单号码"><button @click="searchList('order')">查询</button></div>
+              <span class="dp col-l">订单号码：</span><div class="col-r m-input-button"><input v-model="form.context1" maxlength="32" type="tel" placeholder="请输入查询的订单号码"><button @click="searchList('order')">查询</button></div>
             </div>
           </section>
           <div class="m-tag"><b></b>条件查询</div>
@@ -49,9 +49,9 @@
             </div>
             <div class="row" :class="{active:form.select==4}">
 				<span class="m-form-radio">
-					<label><span class="radio"><input type="radio" value="4" @click="isChe" v-model="form.select"><span></span></span><span class="text">身份证号：</span></label>
+					<label><span class="radio"><input type="radio" value="4" @click="isChe" v-model="form.select"><span></span></span><span class="text">证件号码：</span></label>
 				</span>
-              <div class="input-box"><input v-model="form.context4" :readonly="form.select!=4" maxlength="18" type="text" placeholder="请输入查询的身份证号码"></div>
+              <div class="input-box"><input v-model="form.context4" :readonly="form.select!=4" maxlength="18" type="text" placeholder="请输入查询的证件号码"></div>
             </div>
 
             <button class="f-btn f-btn-line" @click="searchList(1)">查询</button>
@@ -70,7 +70,7 @@
               <th>卡号</th>
               <th>电话号码</th>
               <th>用户姓名</th>
-              <th>身份证号码</th>
+              <th>证件号码</th>
               <th>用户地址</th>
               <th>激活时间</th>
               <th>详情</th>
@@ -161,7 +161,7 @@
         var userInfo=localStorage.getItem('KA_ECS_USER');
         userInfo=JSON.parse(userInfo);
         var customerId=userInfo.customerId;
-        var vm=this,url,whichBtn,json={"customerId": customerId,"orderId":'','phoneNumber':'',"cardNumber":'',"pageNum": "1","pageSize": "10","userName":'',"papersCode":'',"opTimeStart":vm.form.startTime,"opTimeEnd":vm.form.endTime};
+        var vm=this,url,whichBtn,json={"customerId": customerId,"orderId":'','phoneNumber':'',"cardNumber":'',"pageNum": page||1,"pageSize": "10","userName":'',"papersCode":'',"opTimeStart":vm.form.startTime,"opTimeEnd":vm.form.endTime};
 //单条件查询,构造发送给后台的json
         if(index===1){
           vm.off.buttonState=1;
@@ -194,7 +194,7 @@
           }
           else if(s==4&&vm.form.context4===''){
             layer.open({
-              content:"请输入要查询的身份证号",
+              content:"请输入要查询的证件号码",
               skin: 'msg',
               time: 4,
               msgSkin:'error',

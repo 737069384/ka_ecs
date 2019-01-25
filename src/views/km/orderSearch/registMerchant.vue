@@ -7,6 +7,7 @@
 <section class="g-search-menu">
   <div id="search" :class="{active:off.details}">
   	<header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+    <section class="m-occlusion" :class="{active:off.isLoad}"></section>
   	<!--查询-->
   	<section v-if="!off.details">
   	<div class="g-search-form">
@@ -21,6 +22,14 @@
 			</div>
 		</section>
 		<section class="form-c">
+			<div class="row">
+				<span class="dp">商户来源：</span>
+				<div class="m-form-radio">
+					<label><span class="radio"><input value="0" type="radio" v-model="form.merchants"><span></span></span><span class="text">全部</span></label>
+					<label><span class="radio"><input value="1" type="radio" v-model="form.merchants"><span></span></span><span class="text">卡盟</span></label>
+					<label><span class="radio"><input value="2" type="radio" v-model="form.merchants"><span></span></span><span class="text">新零售</span></label>
+				</div>
+			</div>
 			<div class="row">
 				<span class="dp">商户类型：</span>
 				<div class="m-form-radio">
@@ -87,6 +96,7 @@
 					<th>订单号</th>
 					<th>申请时间</th>
 					<th>商户类型</th>
+          <th>商户来源</th>
 					<th>售卡范围</th>
 					<th>申请人号码</th>
 					<th>审核方式</th>
@@ -99,19 +109,22 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(todo,index) in list">
+				<tr v-for="(todo,index) in list" :key="index">
 					<td>{{((pageNum-1)*10+(index+1))}}</td>
 					<td>{{todo.orderId}}</td>
-					<td>{{getDateTime(todo.createTime)[6]}}</td>
+					<td>{{getDateTime(todo.createTime)[8]}}<br>
+              {{getDateTime(todo.createTime)[5]}}
+          </td>
 					<td>
 						<span v-show="todo.merchantType==1">企业</span>
 						<span v-show="todo.merchantType==2">个人</span>
 					</td>
+          <td>{{todo.source_type==1?'卡盟':todo.source_type==2?'新零售':'--'}}</td>
 					<td>
 						<span v-show="todo.openingType==1">远特卡<span v-if="todo.openingArea">({{todo.openingArea}})</span></span>
-                        <span v-show="todo.openingType==2">联通卡<span v-if="todo.openingArea">({{todo.openingArea}})</span></span>
-                        <span v-show="todo.openingType==3">移动卡<span v-if="todo.openingArea">({{todo.openingArea}})</span></span>
-                        <span v-show="todo.openingType==4">电信卡<span v-if="todo.openingArea">({{todo.openingArea}})</span></span>
+            <span v-show="todo.openingType==2">联通卡<span v-if="todo.openingArea">({{todo.openingArea}})</span></span>
+            <span v-show="todo.openingType==3">移动卡<span v-if="todo.openingArea">({{todo.openingArea}})</span></span>
+            <span v-show="todo.openingType==4">电信卡<span v-if="todo.openingArea">({{todo.openingArea}})</span></span>
 					</td>
 					<td>{{todo.phone}}</td>
 					<td>
@@ -124,11 +137,18 @@
 						<span v-show="todo.orderStatus==2" class="f-c-red">拒绝</span>
 						<span v-show="todo.orderStatus==3" class="f-c-yellow">待分配</span>
 						<span v-show="todo.orderStatus==4" class="f-c-green">已分配</span>
+						<span v-show="todo.orderStatus==5" class="f-c-yellow">等待自动审核</span>
+						<span v-show="todo.orderStatus==6" class="f-c-green">复审通过</span>
 					</td>
 					<td>{{todo.companyName}}</td>
 					<td>{{todo.userName}}</td>
-					<td>{{getDateTime(todo.auditTime)[6]}}</td>
-					<td>{{todo.customer}}</td>
+					<td>{{getDateTime(todo.auditTime)[8]}}<br>
+              {{getDateTime(todo.auditTime)[5]}}
+          </td>
+					<td>
+            {{todo.customerName}}<br>
+            {{todo.customer}}
+          </td>
 					<td><a :name="todo.orderId" @click="details" href="javascript:void(0)" class="details">详情</a></td>
 				</tr>
 			</tbody>
@@ -137,162 +157,193 @@
 	</div>
 	</section>
 	<!--详情-->
-	<list-details :list="detailsData" v-if="off.details" :orderType="form.orderType">
-
-	</list-details>
+	<list-details :list="detailsData" v-if="off.details" :orderType="form.orderType"></list-details>
   </div>
 </section>
 </template>
 <script>
-import {reqCommonMethod} from "../../../config/service.js";  
+import { reqCommonMethod } from "../../../config/service.js";
 import pagination from "../../../componentskm/page.vue";
 import details from "../../../componentskm/registMerchantOrderDetails.vue";
-import { getDateTime,getUnixTime ,errorDeal} from "../../../config/utils.js";
-export default{
-	data (){
-		return {
-			off:{
-				isLoad:0,//加载条
-				details:0,//详情页面开关
-			},
-			form:{
-				auditType:0,//审核方式
-				orderType:1,//1,待审核；2，已审核
-				merchantType:0,//1,企业；2，个人
-				orderStatus:0,//订单状态
-				context1:'',//订单号码
-				context2:'',//充值号码
-				startTime:'',
-				endTime:'',
-				select:0//条件查询，选择的条件
-			},
-			list:'',//查询数据
-			detailsData:'',//详情数据
-			total:0,//总查询条数
-			pageNum:1,//当前页数
-			pageSize:10,//显示条数
-			maxpage:1,//最大页数
-			callback:Function//page组件点击回调
-		}
-	},
-	components:{
-		'my-page':pagination,
-		'list-details':details
-	},
-	created:function(){
-		this.init()
-	},
-	methods:{
-		init:function(){
-			var vm=this;
+import { getDateTime, getUnixTime, errorDeal } from "../../../config/utils.js";
+export default {
+  data() {
+    return {
+      off: {
+        isLoad: 0, //加载条
+        details: 0 //详情页面开关
+      },
+      form: {
+        auditType: 0, //审核方式
+        orderType: 1, //1,待审核；2，已审核
+        merchantType: 0, //1,企业；2，个人
+        orderStatus: 0, //订单状态
+        context1: "", //订单号码
+        context2: "", //申请人号码
+        startTime: "",
+        endTime: "",
+		select: 0 ,//条件查询，选择的条件
+		merchants:0,
+      },
+      list: "", //查询数据
+      detailsData: "", //详情数据
+      total: 0, //总查询条数
+      pageNum: 1, //当前页数
+      pageSize: 10, //显示条数
+      maxpage: 1, //最大页数
+      callback: Function //page组件点击回调
+    };
+  },
+  components: {
+    "my-page": pagination,
+    "list-details": details
+  },
+  created: function() {
+    this.init();
+  },
+  methods: {
+    init: function() {
+      var vm = this;
 
-			vm.form.startTime=laydate.now(0,'YYYY-MM-DD 00:00:00');
-			vm.form.endTime=laydate.now(0,'YYYY-MM-DD 23:59:59');
-		},
-		radioClick(){
-			this.form.select=0;
-		},
-		searchList:function(page){
-			var vm=this,select=vm.form.select,
-			   sql="A.create_time BETWEEN "+getUnixTime(vm.form.startTime)+" AND "+getUnixTime(vm.form.endTime)+"",
-			  json={"pageSize":vm.pageSize,"pageNum":page||1,"params":[],"opKey":"order.registerMerchant.list"};
-			let context=vm.form['context'+vm.form.select];
-			if(select==1&&(!context)){
-				layer.open({
-		            content:'请输入订单号码',
-		            skin: 'msg',
-		            time: 2,
-		            msgSkin:'error',
-		        });
-		        return false;
-			}else if(select==2&&context.length!=11){
-				layer.open({
-		            content:'申请人号码格式错误',
-		            skin: 'msg',
-		            time: 2,
-		            msgSkin:'error',
-		        });
-		        return false;
-			}
-			if(vm.form.merchantType!=0)sql+=" AND A.merchant_type="+vm.form.merchantType;
-			if(vm.form.auditType!=0)sql+=" AND A.audit_type="+vm.form.auditType;
+      vm.form.startTime = laydate.now(0, "YYYY-MM-DD 00:00:00");
+      vm.form.endTime = laydate.now(0, "YYYY-MM-DD 23:59:59");
+    },
+    radioClick() {
+      this.form.select = 0;
+    },
+    searchList: function(page) {
+      var vm = this,
+        select = vm.form.select,
+        sql =
+          "A.create_time BETWEEN " +
+          getUnixTime(vm.form.startTime) +
+          " AND " +
+          getUnixTime(vm.form.endTime) +
+          "",
+        json = {
+          pageSize: vm.pageSize,
+          pageNum: page || 1,
+          params: [],
+          opKey: "order.registerMerchant.list"
+        };
+      let context = vm.form["context" + vm.form.select];
+      if (select == 1 && !context) {
+        layer.open({
+          content: "请输入订单号码",
+          skin: "msg",
+          time: 2,
+          msgSkin: "error"
+        });
+        return false;
+      } else if (select == 2 && context.length != 11) {
+        layer.open({
+          content: "申请人号码格式错误",
+          skin: "msg",
+          time: 2,
+          msgSkin: "error"
+        });
+        return false;
+      }
+      if (vm.form.merchantType != 0)
+        sql += " AND A.merchant_type=" + vm.form.merchantType;
+      if (vm.form.auditType != 0)
+        sql += " AND A.audit_type=" + vm.form.auditType;
 
-			if(select==1){
-				sql+=' AND A.order_id="'+context+'"';
-			}else if(select==2){
-				sql+=' AND A.request_phone="'+context+'"';
-			}
-			let orderStatus=vm.form.orderStatus;
-			if(vm.form.orderType==1){
-				 if(orderStatus==0){
-					sql+=" AND (A.order_status=3 OR A.order_status=4)";
-				 }else sql+=" AND A.order_status="+orderStatus;
-			}else if(vm.form.orderType==2){
-				if(orderStatus==0){
-					sql+=" AND (A.order_status=1 OR A.order_status=2)";
-				}else sql+=" AND A.order_status="+orderStatus;
-			}
-
-			json.params.push(sql);
-			if(vm.off.isLoad)return false;
-			vm.off.isLoad=true;
-			// vm.AJAX("w/handler/query",json,function(data){
-			// 	vm.list=data.data.list
-			// 	vm.total=data.data.total;
-			// 	vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
-			// 	vm.pageNum=page||1;
-			// 	vm.callback=function(v){vm.searchList(v)};
-			// },function(){
-			// 	vm.off.isLoad=false;
-            // })
-            reqCommonMethod(json,function(){vm.off.isLoad=false;},"km-ecs/w/handler/query")
-            .then((data)=>{
-                vm.list=data.data.list
-				vm.total=data.data.total;
-				vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
-				vm.pageNum=page||1;
-                vm.callback=function(v){vm.searchList(v)};
-                vm.off.isLoad=false;
-            }).catch(error=>errorDeal(error)); 	
-		},
-		details:function(e){//详情
-			var vm=this,
-			orderId=e.target.name,
-			json={"pageSize":"10","pageNum":"-1","params":['A.order_id="'+orderId+'"'],"opKey":"order.registerMerchant.details"};
-			if(vm.off.isLoad)return false;
-			vm.off.isLoad=true;
-			// vm.AJAX("w/handler/query",json,function(data){
-			// 	vm.detailsData=data.data.list[0];
-			// 	vm.off.details=true;
-			// },function(){
-			// 	vm.off.isLoad=false;
-            // })
-            reqCommonMethod(json,function(){vm.off.isLoad=false;},"km-ecs/w/handler/query")
-            .then((data)=>{
-	            vm.detailsData=data.data.list[0];
-                vm.off.details=true;
-                vm.off.isLoad=false;
-            }).catch(error=>errorDeal(error)); 	
-		},
-		to_laydate:function(v){
-			var vm=this;
-			laydate({
-				istime:true,
-				format: 'YYYY-MM-DD hh:mm:ss',
-				isclear: false,
-				choose: function(dates){ //选择好日期的回调
-					v==1 ? vm.form.startTime=dates : vm.form.endTime=dates;
-				}
-			});
-		},
-		topShiftClick(){
-			var vm=this;
-			vm.form.context3=0
-		},
-		getDateTime(v){
-			return getDateTime(v);
-		}
-	}
-}
+      if (select == 1) {
+        sql += ' AND A.order_id="' + context + '"';
+      } else if (select == 2) {
+        sql += ' AND A.request_phone="' + context + '"';
+      }
+      let orderStatus = vm.form.orderStatus;
+      if (vm.form.orderType == 1) {
+        if (orderStatus == 0) {
+          sql += " AND (A.order_status=3 OR A.order_status=4)";
+        } else sql += " AND A.order_status=" + orderStatus;
+      } else if (vm.form.orderType == 2) {
+        if (orderStatus == 0) {
+          sql +=
+            " AND (A.order_status=1 OR A.order_status=2 OR A.order_status=6)";
+        } else if (orderStatus == 1) {
+          sql += " AND (A.order_status=1 OR A.order_status=6)";
+        } else sql += " AND A.order_status=" + orderStatus;
+	  }
+	  if(vm.form.merchants!=0){
+		  sql+= ' and (select source_type from tb_merchant where  dealer_id=A.dealer_id limit 1)='+vm.form.merchants+''
+	  }
+      json.params.push(sql);
+      if (vm.off.isLoad) return false;
+      vm.off.isLoad = true;
+      reqCommonMethod(
+        json,
+        function() {
+          vm.off.isLoad = false;
+        },
+        "km-ecs/w/handler/query"
+      )
+        .then(data => {
+          vm.list = data.data.list;
+          vm.total = data.data.total;
+          vm.maxpage = Math.ceil(parseInt(data.data.total) / 10);
+          vm.pageNum = page || 1;
+          vm.callback = function(v) {
+            vm.searchList(v);
+          };
+          vm.off.isLoad = false;
+        })
+        .catch(error => errorDeal(error));
+    },
+    details: function(e) {
+      //详情
+      var vm = this,
+        orderId = e.target.name,
+        json = {
+          pageSize: "10",
+          pageNum: "-1",
+          params: ['A.order_id="' + orderId + '"'],
+          opKey: "order.registerMerchant.details"
+        };
+      if (vm.off.isLoad) return false;
+      vm.off.isLoad = true;
+      // vm.AJAX("w/handler/query",json,function(data){
+      // 	vm.detailsData=data.data.list[0];
+      // 	vm.off.details=true;
+      // },function(){
+      // 	vm.off.isLoad=false;
+      // })
+      reqCommonMethod(
+        json,
+        function() {
+          vm.off.isLoad = false;
+        },
+        "km-ecs/w/handler/query"
+      )
+        .then(data => {
+          vm.detailsData = data.data.list[0];
+          vm.off.details = true;
+          vm.off.isLoad = false;
+        })
+        .catch(error => errorDeal(error));
+    },
+    to_laydate: function(v) {
+      var vm = this;
+      laydate({
+        istime: true,
+        format: "YYYY-MM-DD hh:mm:ss",
+        isclear: false,
+        choose: function(dates) {
+          //选择好日期的回调
+          v == 1 ? (vm.form.startTime = dates) : (vm.form.endTime = dates);
+        }
+      });
+    },
+    topShiftClick() {
+      var vm = this;
+      vm.form.context3 = 0;
+    },
+    getDateTime(v) {
+      return getDateTime(v);
+    }
+  }
+};
 </script>
 

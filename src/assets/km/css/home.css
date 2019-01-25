@@ -62,7 +62,8 @@
   background-color: #405364;
   height: 100%;
   left: -1.8rem;
-  z-index: 901
+  z-index: 901;
+  overflow: scroll;
 }
 
 .g-side-nav {}
@@ -101,6 +102,7 @@
   border-top: 1px solid #4C6174;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 
@@ -108,45 +110,43 @@
   background-color: #556A7F;
   border-top-color: #6F8395;
 }
-.g-side-ul>li.active {
+.g-side-ul>.router-link-active {
   background-color: #3F5062;
   border-top: none;
   box-shadow: inset 0 0 7px rgba(0, 0, 0, 0.3);
 }
 
-
-.g-side-ul>li.active>.g-side-subul {
+.g-side-ul>.router-link-active>.g-side-subul {
   margin-bottom: 0.2rem;
   opacity: 1;
   height:auto;
 }
-.g-side-ul>li.active:hover {
+.g-side-ul>.router-link-active:hover {
   background-color: #3F5062;
   border-top-color: inherit;
 }
 
-.g-side-ul>li.active>b,
+.g-side-ul>.router-link-active>b,
 .g-side-ul>li:hover>b {
   width: 6px;
 }
-.g-side-ul>li>a {
-  display: block;
+.g-side-ul>li{
   color: #fff;
   font-size: 0.13rem;
   letter-spacing: 1px;
 }
 
-.g-side-ul>li>a>div {
+.g-side-ul>li>div {
   padding: 0.18rem 0;
   position: relative;
 }
 
-.g-side-ul>li>a>div>span {
+.g-side-ul>li>div>span {
   display: inline-block;
   vertical-align: middle;
 }
 
-.g-side-ul>li>a>div>i {
+.g-side-ul>li>div>i {
   margin-left: 0.2rem;
   margin-right: 0.15rem
 }
@@ -167,7 +167,7 @@
   -moz-transition-duration: .3s;
 }
 
-.g-side-ul .g-side-subul {
+.g-side-subul {
   height:0;
   margin-left: 0.28rem;
   border-left: 1px solid #57687A;
@@ -180,13 +180,17 @@
   -moz-transition:opacity .3s ease-out;
 }
 
-.g-side-ul .g-side-subul>li {
+.g-side-subul>li {
   position: relative;
   top: 0.12rem;
+  cursor: pointer;
+  font-weight: normal;
   margin-bottom: 10px;
+  padding: 5px 0 5px 0.3rem;
+  font-size: 0.13rem;
+  color: #BEBEC0;
 }
-
-.g-side-ul .g-side-subul>li:before {
+.g-side-subul>li:before {
   content: '';
   display: inline-block;
   width: 0.2rem;
@@ -195,29 +199,17 @@
   left: 0;
   top: 0.14rem;
 }
-
-.g-side-ul .g-side-subul>li>a {
-  font-weight: normal;
-  display: block;
-  margin-left: 0.3rem;
-  padding: 5px 0;
-  font-size: 0.13rem;
-  color: #BEBEC0;
-  cursor: pointer;
-  position: relative;
-}
-
-.g-side-ul .g-side-subul>li>a>b {
+.g-side-subul>li>b {
   display: inline-block;
   width: 5px;
   height: 5px;
   background-color: #57687A;
   border-radius: 50%;
   position: absolute;
-  left: -0.1rem;
+  left: -3px;
   top: 0.12rem;
 }
-.g-side-ul .g-side-subul>li>a>span{
+.g-side-subul>li>span{
   position: absolute;
   display: inline-block;
   top: 7px;
@@ -229,13 +221,12 @@
   font-size: 0.1rem;
 }
 
-.g-side-ul .g-side-subul>li>a.router-link-active,
-.g-side-ul .g-side-subul>li>a:hover {
+.g-side-subul>.router-link-active,
+.g-side-subul>li:hover {
   color: #fff;
 }
-
-.g-side-ul .g-side-subul>li>a.router-link-active>b,
-.g-side-ul .g-side-subul>li>a:hover>b {
+.g-side-subul>.router-link-active>b,
+.g-side-subul>li:hover>b {
   background-color: #3DD79B;
 }
 
@@ -314,81 +305,87 @@
 }
 
 .u-icon-menu {
-  background-image: url(../assets/km/images/menu.png);
+  background-image: url(../../images/menu.png);
   width: 0.2rem;
   height: 0.2rem;
 }
 
 .u-icon-home {
-  background-image: url(../assets/km/images/home.png);
+  background-image: url(../../images/home.png);
   width: 0.17rem;
   height: 0.17rem;
 }
+
+.u-icon-chart {
+    background-image: url(../../images/icon_chart.png);
+    width: 0.17rem;
+    height:0.17rem;
+}
 .u-icon-audit {
-  background-image: url(../assets/km/images/audit.png);
+  background-image: url(../../images/audit.png);
   width: 0.17rem;
   height: 0.17rem;
 }
 
 .u-icon-search {
-  background-image: url(../assets/km/images/search.png);
+  background-image: url(../../images/search.png);
   width: 0.17rem;
   height: 0.17rem;
 }
 .u-icon-searchResource {
-  background-image: url(../assets/km/images/net-order.png);
+  background-image: url(../../images/net-order.png);
   width: 0.17rem;
   height: 0.17rem;
 }
 .u-icon-statistics {
-  background-image: url(../assets/km/images/statistics.png);
+  background-image: url(../../images/statistics.png);
   width: 0.17rem;
   height: 0.17rem;
 }
 .u-icon-opinion {
-  background-image: url(../assets/km/images/opinion.png);
+  background-image: url(../../images/opinion.png);
   width: 0.17rem;
   height: 0.17rem;
 }
 .u-icon-fence {
-  background-image: url(../assets/km/images/fence.png);
+  background-image: url(../../images/fence.png);
   width: 0.17rem;
   height: 0.17rem;
 }
 .u-icon-menu2 {
-  background-image: url(../assets/km/images/menu2.png);
+  background-image: url(../../images/menu2.png);
   width: 0.2rem;
   height: 0.2rem;
 }
-
-.u-icon-right {
-  background-image: url(../assets/km/images/right-w.png);
-  width: 0.15rem;
-  height: 0.15rem;
-}
-
 .u-icon-main {
-  background-image: url(../assets/km/images/main.png);
+  background-image: url(../../images/main.png);
   width: 0.2rem;
   height: 0.2rem;
 }
 
 .u-icon-wechat{
-  background-image: url(../assets/km/images/wechat.png);
+  background-image: url(../../images/wechat.png);
   padding:0.1rem;
   display: inline;
 }
 .u-icon-alipay{
-  background-image: url(../assets/km/images/alipay.png);
+  background-image: url(../../images/alipay.png);
   padding:0.1rem;
   display: inline;
 }
 .u-icon-yuantelrecharge{
-  background-image: url(../assets/km/images/icon_yt_chongzhi.png);
+  background-image: url(../../images/icon_yt_chongzhi.png);
   padding:0.1rem;
   display: inline;
 }
-
+.u-icon-morefn{
+  background-image: url(../../images/more.png);
+  width: 0.17rem;
+  height: 0.17rem;
+}
+.u-icon-points{background-image:url(../../images/icon_jifen.png);width: 0.17rem;height: 0.17rem;}
+.u-icon-illegalSearch{background-image:url(../../images/illegalSearch.png);width: 0.17rem;height: 0.17rem;}
+.u-icon-downLoad{background-image:url(../../images/icon_download.png);width: 0.17rem;height: 0.17rem;}
 
 
 /*头部用户组件*/
@@ -415,7 +412,7 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: 0.25rem;
-  background-image: url(../assets/km/images/admin.png);
+  background-image: url(../../images/admin.png);
 }
 
 .m-navside-show,
@@ -502,7 +499,7 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: 0.25rem;
-  background-image: url(../assets/km/images/admin.png);
+  background-image: url(../../images/admin.png);
 }
 
 .m-user-dropdown>li>.user>.info {
@@ -519,59 +516,42 @@
   font-family: fantasy;
   /*color: #3DD79B;*/
 }
-/*头部面包屑*/
-.m-crumb a {
-  color: #fff;
-  /*display: inline-block;vertical-align: middle;height: 0.2rem; line-height: 1.1;*/
-  font-size: 0.13rem;
-}
-
-.m-crumb a:last-child {
-  font-size: 0.12rem;
-}
-
-.m-crumb .mid {
-  padding: 0 7px;
-  position: relative;
-  margin: 0 2px;
-  margin-top: -3px;
-}
 
 /*加载条*/
 .m-scroll-bar{
   position: fixed;
-  width:0;
-  height: 4px;
-  margin:auto;
-  border-radius: 100%;
-  /*background-image: -webkit-linear-gradient(to right, #40C4FF 0,#3E88FA 50%, #40C4FF 100%);
-  background-image: -moz-linear-gradient(to right, #40C4FF 0,#3E88FA 50%, #40C4FF 100%);
-  background-image: linear-gradient(to right, #40C4FF 0,#3E88FA 50%, #40C4FF 100%);
-  background-image: -ms-linear-gradient(to right, #40C4FF 0,#3E88FA 50%, #40C4FF 100%);*/
-  background-color:#20a0ff;
+  top: 0.6rem;
+  right: 0;
   left: 0;
-  right:0;
-  top:0.6rem;
+  display: none;
+  height: 4px;
+  pointer-events: none;
+  -webkit-transform: translateX(-100%);
+  transform: translateX(-100%);
   z-index: 888;
+  background: #20A0FF;
 }
 .m-scroll-bar.active{
-  -webkit-animation-name: scrollBar;-webkit-animation-timing-function:ease-in-out;
-    -moz-animation-name: scrollBar;-moz-animation-timing-function:ease-in-out;
-    animation-name: scrollBar;animation-timing-function:ease-in-out;
-    -moz-animation-direction:alternate;
-    -webkit-animation-direction:alternate;
-    animation-direction:alternate;
-    -moz-animation-duration: 1s;
-    -webkit-animation-duration: 1s;
-    animation-duration: 1s;
+  display: block;
+  animation: LoadingBarForward 1.2s ease-in-out .8s infinite
 }
-@-webkit-keyframes scrollBar{
-  0%{width: 0%;}
-  100%{width: 100%;}
-}
-@keyframes scrollBar{
-  0%{width: 0%;}
-  100%{width: 100%;}
+@keyframes LoadingBarForward {
+    0% {
+        -webkit-transform: translateX(-100%);
+        transform: translateX(-100%)
+    }
+    40% {
+        -webkit-transform: translateX(0);
+        transform: translateX(0)
+    }
+    60% {
+        -webkit-transform: translateX(0);
+        transform: translateX(0)
+    }
+    to {
+        -webkit-transform: translateX(100%);
+        transform: translateX(100%)
+    }
 }
 /*响应式*/
 

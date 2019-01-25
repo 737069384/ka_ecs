@@ -19,6 +19,7 @@
 <section class="g-search-menu">
   <div id="search" :class="{active:off.details}">
   	<header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+    <section class="m-occlusion" :class="{active:off.isLoad}"></section>
   	<!--查询-->
   	<section v-if="!off.details">
   	<div class="g-search-form">
@@ -71,6 +72,7 @@
 					<label><span class="radio"><input type="radio" value="0" v-model="form.deviceId"><span></span></span><span class="text">全部</span></label>
 					<label><span class="radio"><input type="radio" value="1" v-model="form.deviceId"><span></span></span><span class="text">森锐</span></label>
 					<label><span class="radio"><input type="radio" value="2" v-model="form.deviceId"><span></span></span><span class="text">握奇</span></label>
+					<label v-if="off.type!=3"><span class="radio"><input type="radio" value="3" v-model="form.deviceId"><span></span></span><span class="text">卡尔</span></label>
 				</div>
 				<div class="m-form-radio" v-show="off.type==2">
 					<label><span class="radio"><input type="radio" value="0" v-model="form.deviceId"><span></span></span><span class="text">全部</span></label>
@@ -83,8 +85,10 @@
 				<div class="m-form-radio">
 					<label><span class="radio"><input type="radio" value="0" v-model="form.operation"><span></span></span><span class="text">全部</span></label>
 					<label><span class="radio"><input type="radio" value="1" v-model="form.operation"><span></span></span><span class="text">开卡</span></label>
-					<label><span class="radio"><input type="radio" value="2" v-model="form.operation"><span></span></span><span class="text">激活商户</span></label>
-					<label><span class="radio"><input type="radio" value="3" v-model="form.operation"><span></span></span><span class="text">过户办理</span></label>
+					<label v-if="off.type!=3"><span class="radio"><input type="radio" value="2" v-model="form.operation"><span></span></span><span class="text">激活商户</span></label>
+					<label v-if="off.type!=3"><span class="radio"><input type="radio" value="3" v-model="form.operation"><span></span></span><span class="text">过户办理</span></label>
+					<label v-if="off.type!=3"><span class="radio"><input type="radio" value="4" v-model="form.operation"><span></span></span><span class="text">实名补登</span></label>
+					<label v-if="off.type!=3"><span class="radio"><input type="radio" value="5" v-model="form.operation"><span></span></span><span class="text">换补卡</span></label>
 				</div>
 			</div>
 			<div class="row">
@@ -125,27 +129,26 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(todo,index) in list">
+				<tr v-for="(todo,index) in list" :key="index">
 					<td>{{ (pageNum-1)*pageSize+(index+1) }}</td>
 					<td>{{ todo.userId }}<br/>（{{todo.userName}}）</td>
-                    <td>
-                        <span v-show="off.type==1||off.type==2">{{ getDateTime(todo.readTime)[6] }}</span>
-                        <span v-show="off.type==3">{{ getDateTime(todo.writeTime)[6] }}</span>
-                    </td>
+            <td>
+                <span v-show="off.type==1||off.type==2">{{ getDateTime(todo.readTime)[6] }}</span>
+                <span v-show="off.type==3">{{ getDateTime(todo.writeTime)[6] }}</span>
+            </td>
 					<td>
 						<span v-show="todo.terminalType==1">IOS</span>
 						<span v-show="todo.terminalType==2">Android</span>
 					</td>
 					<td>
 						<span v-show="off.type==1||off.type==3">
-							<b v-show="todo.deviceId==1">森锐</b>
-							<b v-show="todo.deviceId==2">握奇</b>
+              {{translateData(9,todo.deviceId)}}
 						</span>
 						<span v-show="off.type==2">
-							<b v-show="todo.deviceId==1">旷视</b>
+							<label v-show="todo.deviceId==1">旷视</label>
 						</span>
 					</td>
-					<td>{{ todo.orderId }}</td>
+					<td>{{ todo.orderId||'--' }}</td>
 					<td>
 						<span v-show="todo.appType==1">卡盟APP</span>
 						<span v-show="todo.appType==2">Dwatch</span>
@@ -154,14 +157,12 @@
 						<span v-show="todo.appType==5">卡盟通服</span>
 					</td>
 					<td>
-						<span v-show="todo.operation==1">开卡</span>
-						<span v-show="todo.operation==2">激活商户</span>
-						<span v-show="todo.operation==3">过户办理</span>
+						<span>{{translateData(3,todo.operation)}}</span>
 					</td>
-					<td v-show="off.type==1||off.type==2">{{ todo.idCardNo }}</td>
-					<td>{{ todo.phoneNo }}</td>
+					<td v-show="off.type==1||off.type==2">{{ todo.idCardNo||'--' }}</td>
+					<td>{{ todo.phoneNo||'--' }}</td>
 					<td>
-						<span v-show="todo.result==0" class="f-c-red">失败</span>
+						<span v-show="todo.result==0" class="f-c-red">失败 : {{todo.errorMsg||'--'}} </span>
 						<span v-show="todo.result==1" class="f-c-green">成功</span>
 					</td>
 				</tr>
@@ -186,8 +187,8 @@
 <script>
 import {reqCommonMethod} from "../../../config/service.js";
 import pagination from "../../../componentskm/page.vue";
-import { getDateTime,getUnixTime } from "../../../config/utils.js";
-import {setStore, getStore, createDownload} from '../../../config/utils';
+import { getDateTime,getUnixTime,errorDeal } from "../../../config/utils.js";
+import {setStore, getStore, createDownload,translateData} from '../../../config/utils';
 export default{
 	data (){
 		return {
@@ -249,82 +250,69 @@ export default{
 					"appType":vm.form.appType,
 				};
 			if(vm.off.type==1){
-                url="km-ecs/w/statistics/identifier";
-                json.idCardNo=vm.form.idCardNo;
+        url="km-ecs/w/statistics/identifier";
+        json.idCardNo=vm.form.idCardNo;
 			}else if(vm.off.type==2){
-                url="km-ecs/w/statistics/identifierLive";
-                json.idCardNo=vm.form.idCardNo;
+        url="km-ecs/w/statistics/identifierLive";
+        json.idCardNo=vm.form.idCardNo;
 			}else if(vm.off.type==3){
 				url="km-ecs/w/statistics/writecard";
-            }
-
-			if(vm.off.isLoad)return false;
+      }
 			vm.off.isLoad=true;
-			// vm.AJAX(url,json,function(data){
-			// 	vm.list=data.data.list;
-			// 	vm.total=data.data.total;
-			// 	vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
-			// 	vm.pageNum=page||1;
-			// 	vm.callback=function(v){vm.searchList(index,v)};
-			// },function(){
-			// 	vm.off.isLoad=false;
-            // });
-            reqCommonMethod(json,function(){vm.off.isLoad=false;},url)
-            .then((data)=>{
-                vm.list=data.data.list;
+      reqCommonMethod(json,function(){vm.off.isLoad=false;},url)
+      .then((data)=>{
+        vm.list=data.data.list;
 				vm.total=data.data.total;
 				vm.maxpage=Math.ceil(parseInt(data.data.total)/10);
 				vm.pageNum=page||1;
-                vm.callback=function(v){vm.searchList(index,v)};
-                vm.off.isLoad=false;
-            }).catch(error=>errorDeal(error)); 	            
+        vm.callback=function(v){vm.searchList(index,v)};
+      }).catch(error=>errorDeal(error)); 	            
 		},
 		downLoadList:function(){//导出EXCEL
 			var vm=this,url,userInfo=getStore("KA_ECS_USER");
 		    if(!userInfo){
-		         layer.open({
-		            content:'登录已过期，请重新登录',
-		            style:'width:auto;',
-		            btn:['确定'],
-		            shadeClose:false,
-		            yes:function(){
-		                setStore("KA_ECS_USER","");
-		                window.location.href="#/login";
-		                layer.closeAll();
-		            }
-		        });
-		        return false;
+					layer.open({
+						content:'登录已过期，请重新登录',
+						style:'width:auto;',
+						btn:['确定'],
+						shadeClose:false,
+						yes:function(){
+							setStore("KA_ECS_USER","");
+							window.location.href="#/login";
+							layer.closeAll();
+						}
+					});
+					return false;
 		    }
 			var json={
-					"userId":vm.form.userId,
-					"pageSize":vm.pageSize,
-					"pageNum":vm.page||1,
-					"startTime":vm.form.startTime,
-					"endTime":vm.form.endTime,
-					"terminalType":vm.form.terminalType,
-					"deviceId":vm.form.deviceId,
-					"result":vm.form.result,
-					"customerId":userInfo.customerId,
-					"codeId":userInfo.codeId,
-					"orderId":vm.form.orderId,
-					"phoneNo":vm.form.phoneNo,
-					"operation":vm.form.operation,
-					"appType":vm.form.appType,
-				};
+				"userId":vm.form.userId,
+				"pageSize":vm.pageSize,
+				"pageNum":vm.page||1,
+				"startTime":vm.form.startTime,
+				"endTime":vm.form.endTime,
+				"terminalType":vm.form.terminalType,
+				"deviceId":vm.form.deviceId,
+				"result":vm.form.result,
+				"customerId":userInfo.customerId,
+				"codeId":userInfo.codeId,
+				"orderId":vm.form.orderId,
+				"phoneNo":vm.form.phoneNo,
+				"operation":vm.form.operation,
+				"appType":vm.form.appType,
+			};
 			if(vm.off.type==1){
-                url="km-ecs/w/statistics/identifierListdown";
-                 json.idCardNo=vm.form.idCardNo;
+        url="km-ecs/w/statistics/identifierListdown";
+        json.idCardNo=vm.form.idCardNo;
 			}else if(vm.off.type==2){
-                url="km-ecs/w/statistics/identifierLivedown";
-                 json.idCardNo=vm.form.idCardNo;
+        url="km-ecs/w/statistics/identifierLivedown";
+        json.idCardNo=vm.form.idCardNo;
 			}else if(vm.off.type==3){
 				url="km-ecs/w/statistics/writecarddown";
-            }
+      }
 			vm.off.load=true;
 			createDownload(url,BASE64.encode(JSON.stringify(json)),function(){
 				vm.off.load=false;
 			});
-            
 		},
 		to_laydate:function(v){
 			var vm=this;
@@ -342,15 +330,18 @@ export default{
 		},
 		changeRouter(){
 			let type=this.$route.params.type
-			if(type=="idCard"){
+			if(type=="idCard"){//身份证识别
 				this.off.type=1;
-			}else if(type=="faceConfirm"){
+			}else if(type=="faceConfirm"){//活体识别
 				this.off.type=2;
-			}else if(type=="writeCard"){
+			}else if(type=="writeCard"){//写卡记录
 				this.off.type=3;                
-            }
-		     this.list='';
-		}
+      }
+		    this.list='';
+    },
+    translateData(t,v){
+      return translateData(t,v);
+    },
 	}
 }
 </script>

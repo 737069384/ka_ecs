@@ -14,6 +14,7 @@
 <template>
 	<div style="padding:15px;">
 		<header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+        <section class="m-occlusion" :class="{active:off.isLoad}"></section>
 		<div class="m-input-button o-input-button">
 			<input maxlength="16" type="tel" v-model="form.dealerId" placeholder="请输入查询的推广方ID"><button @click="searchClick">查询</button>
 		</div>
@@ -26,7 +27,6 @@
 						<th>创建时间</th>
 						<th>创建人</th>
 						<th>推广码</th>
-						
 						<th>号码模式</th>
 						<th>折扣模式</th>
 						<th>转账模式</th>
@@ -55,7 +55,7 @@
 						<th>设备编号</th>
 						<th>激活状态</th>
 						<th>MAC地址</th>
-						<th>业务范围</th>
+						<th>售卡范围</th>
 						<th>创建时间</th>
 						<th>激活时间</th>
 					</tr>
@@ -93,7 +93,7 @@
 						<th>网点名称</th>
 						<th>总部推广渠道</th>
 						<th>商户类型</th>
-						<th>业务范围</th>
+						<th>售卡范围</th>
 						<th>签约状态</th>
 						<th>创建时间</th>
 					</tr>

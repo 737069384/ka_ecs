@@ -7,6 +7,7 @@
 <section class="g-search-menu">
   <div id="search" :class="{active:off.details}">
   	<header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+    <section class="m-occlusion" :class="{active:off.isLoad}"></section>
   	<!--查询-->
   	<section v-if="!off.details">
   	<div class="g-search-form">
@@ -15,8 +16,8 @@
 			<div class="row">
 				<span class="dp">充值类型：</span>
 				<div class="m-form-radio">
-					<label><span class="radio"><input value="1" type="radio" v-model="form.rechargeType"><span></span></span><span class="text">流量</span></label>
-					<label><span class="radio"><input value="2" type="radio" v-model="form.rechargeType"><span></span></span><span class="text">话费</span></label>
+					<label @click="shiftRechargeType()"><span class="radio"><input value="2" type="radio" v-model="form.rechargeType"><span></span></span><span class="text">话费</span></label>
+					<label @click="shiftRechargeType()"><span class="radio"><input value="1" type="radio" v-model="form.rechargeType"><span></span></span><span class="text">流量</span></label>
 				</div>
 			</div>
 			<div class="row">
@@ -27,6 +28,28 @@
 					<label><span class="radio"><input type="radio" value="1" v-model="form.isp"><span></span></span><span class="text">移动</span></label>
 					<label><span class="radio"><input type="radio" value="2" v-model="form.isp"><span></span></span><span class="text">联通</span></label>
 					<label><span class="radio"><input type="radio" value="3" v-model="form.isp"><span></span></span><span class="text">电信</span></label>
+					<label v-if="form.rechargeType==2"><span class="radio"><input type="radio" value="other" v-model="form.isp"><span></span></span><span class="text">其他</span></label>
+				</div>
+			</div>
+			<div class="row" v-if="form.rechargeType==2">
+                <span class="dp">充值来源：</span>
+                <div class="m-form-checkbox">
+                    <label><span class="checkbox"><input type="checkbox" value="1" v-model="form.sourceType" checked="checked"><span></span></span><span class="text">卡盟APP</span></label>
+                    <label><span class="checkbox"><input type="checkbox" value="5" v-model="form.sourceType" checked="checked"><span></span></span><span class="text">远特i卡</span></label>
+                    <label><span class="checkbox"><input type="checkbox" value="6" v-model="form.sourceType" checked="checked"><span></span></span><span class="text">远特eSIM</span></label>
+                    <label><span class="checkbox"><input type="checkbox" value="7" v-model="form.sourceType" checked="checked"><span></span></span><span class="text">eSIM助手</span></label>
+                    <label><span class="checkbox"><input type="checkbox" value="8" v-model="form.sourceType" checked="checked"><span></span></span><span class="text">sdk</span></label>
+					<label><span class="checkbox"><input type="checkbox" value="9" v-model="form.sourceType" checked="checked"><span></span></span><span class="text">国星卡</span></label>
+					<label><span class="checkbox"><input type="checkbox" value="10" v-model="form.sourceType" checked="checked"><span></span></span><span class="text">新零售</span></label>
+                </div>
+            </div>
+			<div class="row">
+				<span class="dp">支付方式：</span>
+				<div class="m-form-radio">
+					<label><span class="radio"><input type="radio" value="0" v-model="form.payType"><span></span></span><span class="text">全部</span></label>
+					<label><span class="radio"><input type="radio" value="1" v-model="form.payType"><span></span></span><span class="text">远特账户</span></label>
+					<label><span class="radio"><input type="radio" value="2" v-model="form.payType"><span></span></span><span class="text">微信</span></label>
+					<label><span class="radio"><input type="radio" value="3" v-model="form.payType"><span></span></span><span class="text">支付宝</span></label>
 				</div>
 			</div>
 			<div class="row">
@@ -35,15 +58,6 @@
 					<span class="m-time-area">
 						<input @click="to_laydate(1)" v-model="form.startTime" type="text" readonly="readonly"><input @click="to_laydate(2)" v-model="form.endTime" type="text" readonly="readonly">
 					</span>
-				</div>
-			</div>
-			<div class="row">
-				<span class="dp">支付方式：</span>
-				<div class="m-form-radio">
-					<label><span class="radio"><input type="radio" value="0" v-model="form.payType"><span></span></span><span class="text">全部</span></label>
-					<label><span class="radio"><input type="radio" value="1" v-model="form.payType"><span></span></span><span class="text">远特账户</span></label>
-					<label><span class="radio"><input type="radio" value="2" v-model="form.payType"><span></span></span><span class="text">微信</span></label>
-					<label><span class="radio"><input type="radio" value="3" v-model="form.payType"><span></span></span><span class="text">支付宝</span></label>
 				</div>
 			</div>
 		</section>
@@ -72,10 +86,10 @@
 					<label><span class="radio"><input type="radio" value="4" :readonly="form.select!=4" v-model="form.select"><span></span></span><span class="text">订单状态：</span></label>
 				</span>
 				<div class="m-form-radio col-radio">
-					<label><span class="radio"><input type="radio" value="0" v-model="form.context4"><span></span></span><span class="text">全部</span></label>
-					<label><span class="radio"><input type="radio" value="1" v-model="form.context4"><span></span></span><span class="text">成功</span></label>
-					<label><span class="radio"><input type="radio" value="2" v-model="form.context4"><span></span></span><span class="text">失败</span></label>
-					<label><span class="radio"><input type="radio" value="3" v-model="form.context4"><span></span></span><span class="text">进行中</span></label>
+					<label><span @click="checked4" class="radio"><input type="radio" value="0" v-model="form.context4"><span></span></span><span class="text">全部</span></label>
+					<label><span @click="checked4" class="radio"><input type="radio" value="1" v-model="form.context4"><span></span></span><span class="text">成功</span></label>
+					<label><span @click="checked4" class="radio"><input type="radio" value="2" v-model="form.context4"><span></span></span><span class="text">失败</span></label>
+					<label><span @click="checked4" class="radio"><input type="radio" value="3" v-model="form.context4"><span></span></span><span class="text">进行中</span></label>
 					<label v-show="form.rechargeType==1"><span class="radio"><input type="radio" value="4" v-model="form.context4"><span></span></span><span class="text">已关闭</span></label>
 				</div>
 			</div>
@@ -93,10 +107,12 @@
 				<tr>
 					<th>序号</th>
 					<th>订单号</th>
+					<th v-show="form.rechargeType == 2">充值来源</th>
 					<th>充值号码</th>
 					<th>充值面额</th>
 					<th>运营商</th>
 					<th>支付方式</th>
+					<th>支付状态</th>
 					<th>充值时间</th>
 					<th>操作人</th>
 					<th>订单状态</th>
@@ -107,6 +123,15 @@
 				<tr v-for="(todo,index) in list">
 					<td>{{((pageNum-1)*10+(index+1))}}</td>
 					<td>{{todo.orderId}}</td>
+					<td v-show="form.rechargeType == 2">
+						<span v-show="todo.sourceType == 1">卡盟APP</span>
+						<span v-show="todo.sourceType == 5">远特i卡</span>
+						<span v-show="todo.sourceType == 6">远特eSIM</span>
+						<span v-show="todo.sourceType == 7">eSIM助手</span>
+						<span v-show="todo.sourceType == 8">SDK</span>
+						<span v-show="todo.sourceType == 9">国星卡</span>
+						<span v-show="todo.sourceType == 10">新零售</span>
+					</td>
 					<td>{{todo.phone}}</td>
 					<td>
 						<span v-show="todo.rechargeType==2">{{parseFloat(todo.money)/100}}</span>
@@ -117,11 +142,18 @@
 						<span v-show="todo.isp==2">联通</span>
 						<span v-show="todo.isp==3">电信</span>
 						<span v-show="todo.isp==4">远特</span>
+                        <span v-show="todo.isp>4">{{todo.ispName}}</span>
 					</td>
 					<td>
 						<span v-show="todo.payType==1" class="u-icon-yuantelrecharge"></span>
 						<span v-show="todo.payType==2" class="u-icon-wechat"></span>
 						<span v-show="todo.payType==3" class="u-icon-alipay"></span>
+					</td>
+					<td>
+						<span v-show="todo.pay_status==1" class="f-c-yellow">待支付</span>
+						<span v-show="todo.pay_status==2" class="f-c-green">支付成功</span>
+						<span v-show="todo.pay_status==3" class="f-c-red">支付失败</span>
+						<span v-show="todo.pay_status==4" class="f-c-red">关闭订单</span>
 					</td>
 					<td>{{getDateTime(todo.rechargeTime)[6]}}</td>
 					<td>{{todo.userId}}<br/>（{{todo.userName}}）</td>
@@ -135,6 +167,7 @@
 						<span v-show="todo.orderStatus==0" class="f-c-yellow">进行中</span>
 						<span v-show="todo.orderStatus==2" class="f-c-red">失败</span>
 						<span v-show="todo.orderStatus==1" class="f-c-green">成功</span>
+						<span v-show="todo.orderStatus==3" class="f-c-blue">充值中</span>
 					</td>
 					<td><a :name="todo.orderId" @click="details" href="javascript:void(0)" class="details">详情</a></td>
 				</tr>
@@ -144,9 +177,7 @@
 	</div>
 	</section>
 	<!--详情-->
-	<list-details :list="detailsData" v-if="off.details" :number="off.number">
-
-	</list-details>
+	<list-details :list="detailsData" v-if="off.details" :number="off.number"></list-details>
   </div>
 </section>
 </template>
@@ -161,11 +192,12 @@ export default{
 			off:{
 				isLoad:0,//加载条
 				details:0,//详情页面开关
-				number:'',//第几条详情
+                number:'',//第几条详情
+                ispName:false,
 			},
 			form:{
 				isp:0,//运营商
-				rechargeType:1,//操作类型
+				rechargeType:2,//操作类型
 				payType:0,//支付方式
 				context1:'',//订单号码
 				context2:'',//充值号码
@@ -173,6 +205,7 @@ export default{
 				context4:0,//订单状态
 				startTime:'',
 				endTime:'',
+				sourceType:[1,5,6,7,8,9,10],
 				select:4//条件查询，选择的条件
 			},
 			list:'',//查询数据
@@ -191,7 +224,14 @@ export default{
 	},
 	created:function(){
 		this.init()
-	},
+    },
+    watch:{
+        'form.select'(){
+            if(this.form.select!=4){
+                this.form.context4=0;
+            }
+        }
+    },
 	methods:{
 		init:function(){
 			var vm=this;
@@ -202,7 +242,8 @@ export default{
 		getForm(page){
 			var vm=this,select=vm.form.select,
 			   sql="A.create_time BETWEEN "+getUnixTime(vm.form.startTime)+" AND "+getUnixTime(vm.form.endTime)+"",
-			  json={"pageSize":vm.pageSize,"pageNum":page||1,"params":[]};
+              json={"pageSize":vm.pageSize,"pageNum":page||1,"params":[]};
+              vm.off.ispName=false;
 			let context=vm.form['context'+vm.form.select];
 			if(select==1&&(!context)){
 				layer.open({
@@ -263,18 +304,24 @@ export default{
 				if(vm.form.isp!=0){
 					sql+=" AND A.info_isp="+vm.form.isp;
 				}
-				json.sum='A.info_price';
-			}else if(vm.form.rechargeType==2){
+				json.sum='info_price';
+			}else if(vm.form.rechargeType==2){//话费
 				json.opKey="order.rechargePhone.list";
-				if(vm.form.isp!=0){
+				if(vm.form.isp!=0&&vm.form.isp!='other'){
 					sql+=" AND A.isp="+vm.form.isp;
-				}
-				json.sum='A.info_fee';
+				}else if(vm.form.isp=='other'){
+                    sql+=" AND A.isp>4";
+                    vm.off.ispName=true;
+                }
+                let sourceType = vm.form.sourceType.join(',') || '1,5,6,7,8,9,10';
+                sql += ` AND A.source_type in (${sourceType})`;
+
+				json.sum='money';
 			}
 			json.params.push(sql);
 			return json;
 		},
-		searchList:function(page){
+		searchList(page){
 			const vm=this;
 			let json=vm.getForm(page);
 			if(!json)return false;
@@ -293,12 +340,10 @@ export default{
             }).catch(error=>errorDeal(error));
 		},
 		// 导出查询结果excel
-		downLoadList:function(){
+		downLoadList(){
 			const vm=this;
 			let json=vm.getForm();
 			if(!json)return false;
-			if(vm.form.rechargeType==1)json.exportType=2;
-			if(vm.form.rechargeType==2)json.exportType=1;
 			json.pageNum="-1";
 			let userInfo = getStore("KA_ECS_USER");
 			json.customerId = userInfo.customerId;
@@ -310,7 +355,7 @@ export default{
 		        vm.off.isLoad=false;
 	      	});
 		},
-		details:function(e){//详情
+		details(e){//详情
 			var vm=this,
 			orderId=e.target.name,
 			json={"pageSize":"10","pageNum":"-1","params":['A.sys_order_id="'+orderId+'"']};
@@ -334,7 +379,7 @@ export default{
                  vm.off.isLoad=false;
             }).catch(error=>errorDeal(error)); 	
 		},
-		to_laydate:function(v){
+		to_laydate(v){
 			var vm=this;
 			laydate({
 				istime:true,
@@ -344,10 +389,13 @@ export default{
 					v==1 ? vm.form.startTime=dates : vm.form.endTime=dates;
 				}
 			});
-		},
-		topShiftClick(){
+        },
+        checked4(){
+            this.form.select=4;
+        },
+		shiftRechargeType(){
 			var vm=this;
-			vm.list='';
+			vm.form.isp='0';
 		},
 		getDateTime(v){
 			return getDateTime(v);

@@ -1,5 +1,4 @@
 <style scoped>
-@import "../../assets/ym/css/search.css";
 [v-cloak]{
     display: none;
 }
@@ -29,8 +28,8 @@ ul > li {
   display: inline-block;
 }
 ul > li > span > img {
-  width: 50px;
-  height: 50px;
+  width: .6rem;
+  height: .6rem;
 }
 label {
   display: block;
@@ -52,6 +51,7 @@ select {
 <template>
 <div>
 <header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+<section class="m-occlusion" :class="{active:off.isLoad}"></section>
     <section >
     <div>
         <p v-cloak class="timeDiv">现在时间:{{time}}</p>
@@ -67,7 +67,7 @@ select {
         </p>
         <ul > 
             <li v-for="(v,index) in downloadDate">
-                <span><img src="../../assets/ym/images/excelIcon.jpg" alt="icon"></span>
+                <span><img src="../../assets/images/excel.svg" alt="icon"></span>
                 <span> <label v-cloak for="">{{v}}</label> <label for=""> <a href="javascript:void(0)" @click="downLoadExcel(v)"> 下载报表</a></label></span>
             </li>
         </ul>
@@ -81,6 +81,7 @@ import {reqCommonMethod} from "../../config/service.js";
 import pagination from "../ym/page.vue";
 import details from "../ym/searchListDetails.vue";
 import layerForm from "../ym/layerForm.vue";
+import "../../assets/ym/css/search.css";
 import axios from "axios";
 export default {
     name:"Excel",
@@ -129,21 +130,16 @@ export default {
       vm.selectedy=initYear+"年";
       vm.selectedm=vm.timemonth[initMonth-1];
       if(initMonth<10){
-          initMonth="0"+initMonth;
+        initMonth="0"+initMonth;
       }
       let initTime=""+initYear+initMonth;
       let data={date:initTime};
-    //   vm.AJAX("c/audit/dailyAudits",data,function(data){
-    //       if(data.code==200){
-    //           vm.downloadDate=data.data.dailyAudits;
-    //       }
-    //   })
       reqCommonMethod(data,function(){vm.off.isLoad=false;},"ym-ecs/c/audit/dailyAudits")    
       .then((data)=>{
           if(data.code==200){
             let arr=[];
-              data.data.dailyAudits.sort((a,b)=> parseInt(a.replace(/[^0-9]/ig,"")) > parseInt(b.replace(/[^0-9]/ig,"")) ? 1 : -1);
-              vm.downloadDate=data.data.dailyAudits;
+            data.data.dailyAudits.sort((a,b)=> parseInt(a.replace(/[^0-9]/ig,"")) > parseInt(b.replace(/[^0-9]/ig,"")) ? 1 : -1);
+            vm.downloadDate=data.data.dailyAudits;
           }
           vm.off.isLoad=false;
       }).catch(error=>errorDeal(error)); 
@@ -152,9 +148,6 @@ export default {
           vm.timeyear.push(i + "年");
         }
       }
-    //   debugger;
-    //   var nowYear = nowTime.getFullYear();
-    //   debugger;
     },
     updateTime: function() {
       let vm = this,

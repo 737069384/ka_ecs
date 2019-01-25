@@ -14,6 +14,7 @@
 <template>
 	<div style="padding:15px;">
 		<header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+        <section class="m-occlusion" :class="{active:off.isLoad}"></section>
 		<div class="m-input-button o-input-button">
 			<input maxlength="16" type="tel" v-model="form.deviceNumber" placeholder="请输入查询的设备编号"><button @click="searchClick">查询</button>
 		</div>
@@ -28,7 +29,7 @@
 						<th>激活时间</th>
 						<th>推广方</th>
 						<th>绑定商户</th>
-						<th>业务范围</th>
+						<th>售卡范围</th>
 					</tr>
 				</thead>
 				<tbody>

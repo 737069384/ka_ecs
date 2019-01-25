@@ -1,15 +1,14 @@
 *{margin: 0;padding: 0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
 a {text-decoration: none;-webkit-tap-highlight-color:rgba(0,0,0,0);outline: none;}
-b{font-weight: normal;}
 em, i{font-style:normal; }
 ul, ol{list-style: none;}
 html{font-size: 625%;}
 html,body{width: 100%;height: 100%;}
-body{background-color:#F1F2F3;margin: auto;color: #48576a;font-family: "Microsoft YaHei","Arial","微软雅黑";-webkit-overflow-scrolling: touch;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-size:0.13rem;}
+body{background-color:#F1F2F3;margin: auto;color: rgba(0,0,0,0.65);font-family: "Microsoft YaHei","Arial","微软雅黑";-webkit-overflow-scrolling: touch;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;font-size:0.13rem;}
 #app{position: absolute;top:0; width: 100%;height: 100%;min-width: 300px;}
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appearance: none !important; margin: 0;}
 input[type="number"]{-moz-appearance:textfield;}
-input, button{ -webkit-appearance: none;-moz-appearance: none;-ms-appearance: none;appearance: none;outline: none;}
+/* input, button{ -webkit-appearance: none;-moz-appearance: none;-ms-appearance: none;appearance: none;outline: none;} */
 
 /*公共基础*/
 .f-tal{text-align: left;}
@@ -28,21 +27,37 @@ input, button{ -webkit-appearance: none;-moz-appearance: none;-ms-appearance: no
 .f-c-yellow, .fCYellow{color:#ffc333;}
 .f-c-grey, .fCGrey{color:#A5A5A5 !important;}
 .f-c-purple{color:#4b3887;}
+.f-s-12{font-size: 12px;}
 .fCBlack{color: #000;}
 .f-inline-block{display: inline-block;vertical-align: middle;}
 .f-mgt-10{margin-top: 0.1rem;}
-
 .f-bdr50{border-radius: 50%;}
-.f-btn{ display: inline-block;color: #fff; outline: none;border:none; text-align: center;line-height: 1;font-size: 0.14rem;border-radius: 8px;cursor: pointer;} 
+.f-btn{ display: inline-block;color: #fff; outline: none;border:none; text-align: center;line-height: 1;font-size: 0.14rem;border-radius: 3px;cursor: pointer;} 
 .f-btn-success{background-color: #13ce66;}
 .f-btn-success:hover, .f-btn-success:active{background-color:#42d885;}
 .f-btn-danger{background-color: #ff4949;}
 .f-btn-danger:hover, .f-btn-danger:active{background-color:#ff6d6d;}
 .f-btn-line{border:1px solid transparent;border-color: #8391a5;background-color:#fff;color: #1f2d3d;}
 .f-btn-line:hover{border-color: #20a0ff;color: #20a0ff;}
-.f-btn-warning{background-color: #f7ba2a;}
+.f-btn-warning{background-color: #f7ba2a;color: #fff;}
 .f-btn-warning:active, .f-btn-warning:hover { background-color: #f9c855;}
-
+.f-a-td{text-decoration: underline;color:#20a0ff;cursor: pointer}
+.f-no-data{
+    padding:0.2rem;
+    text-align: center;
+    background-color: #fff;
+    border:1px solid #dfe6ec;
+    border-top: none;
+}
+.f-mask{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: -1;
+}
 
 [class*=" u-icon"],
 [class^="u-icon-"] {
@@ -113,6 +128,60 @@ input, button{ -webkit-appearance: none;-moz-appearance: none;-ms-appearance: no
     transform: translate(-50%, -50%) scale(1);
     -webkit-transform: translate(-50%, -50%) scale(1);-moz-transform: translate(-50%, -50%) scale(1);
 }
+/*单选按钮2*/
+.m-form-radio>label>.radioYes{white-space: nowrap;
+    cursor: pointer;
+    outline: none;
+    display: inline-block;
+    /*line-height: 1;*/
+    position: relative;
+    vertical-align: middle}
+.m-form-radio>label>.radioYes>span{border: 1px solid #bfcbd9;
+    border-radius: 100%;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #fff;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;}
+.m-form-radio>label>.radioYes>span:hover{border-color: #20a0ff}
+.m-form-radio>label>.radioYes>span:after{
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+     -moz-border-radius: 50%;
+     -webkit-border-radius: 50%;
+    /* background: #20a0ff; */
+    background-image: url("../../images/icon/cc-yes-crude.svg");
+    background-size: contain;
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    -webkit-transform: translate(-50%, -50%) scale(0);
+    transition: transform .15s cubic-bezier(.71, -.46, .88, .6);
+    -webkit-transition: transform .15s cubic-bezier(.71, -.46, .88, .6);
+}
+.m-form-radio>label>.radioYes>input{ opacity: 0;
+    outline: none;
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0}
+.m-form-radio>label>.radioYes>input:checked+span{
+    border-color: #20ff2b;
+
+}
+.m-form-radio>label>.radioYes>span:hover{border-color: #20ff2b}
+.m-form-radio>label>.radioYes>input:checked+span:after{
+    transform: translate(-50%, -50%) scale(1);
+    -webkit-transform: translate(-50%, -50%) scale(1);-moz-transform: translate(-50%, -50%) scale(1);
+}
 
 
 
@@ -179,12 +248,17 @@ input, button{ -webkit-appearance: none;-moz-appearance: none;-ms-appearance: no
 .m-form-checkbox>label>.checkbox>input:checked+span{border-color: #0190fe;background: #20a0ff;}
 .m-form-checkbox>label>.checkbox>input:checked+span:after{transform: rotate(45deg) scaleY(1);-moz-transform: rotate(45deg) scaleY(1);-webkit-transform: rotate(45deg) scaleY(1)}
 
+/* 加载过程弹出层 */
+.m-occlusion.active{position: absolute;top: 0;left: 0;width: 100%;height: 100%;z-index:999;}
 
 /*layer弹出层公共样式*/
-.lay-details{max-height:4.5rem;overflow-y: scroll;}
+.lay-details{overflow-y: auto;}
 .lay-details>li{margin-bottom:2px;}
 .lay-details>li>.fl{width:1.3rem;text-align: right;}
+.lay-details>li>.tl{text-align: left;}
 .lay-details>li>.fright{margin-left: 1.35rem;text-align: left; }
+.lay-details>li>.autoAudit{width: 3rem !important}
+.lay-details>li>.autoAudit+.fright{margin-left: 3rem !important}
 
 .lay-details.light>li>.fl{width: 1rem}
 .lay-details.light>li>.fright{margin-left: 0.85rem;}
@@ -205,9 +279,9 @@ input, button{ -webkit-appearance: none;-moz-appearance: none;-ms-appearance: no
 .layer-refuse-pop>textarea{
     border-radius: 7px;
     width: 100%;
-  border: 1px solid #bfcbd9;color: #1f2d3d;
-  padding: 0.1rem 0;
-  height: 0.6rem;
+    border: 1px solid #bfcbd9;color: #1f2d3d;
+    padding: 0.1rem 0;
+    height: 0.6rem;
     transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
   -webkit-transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
   -moz-transition: border-color .2s cubic-bezier(.645, .045, .355, 1);
@@ -223,10 +297,11 @@ input, button{ -webkit-appearance: none;-moz-appearance: none;-ms-appearance: no
 .o-fl-w>.clr>.fright{
     width:auto;
     margin-left:2.2rem;
+    margin-right: .1rem;
 }
 /*拒绝弹出层*/
 
-.lay-div-refuse{max-height:5rem;overflow-y:scroll;}
+.lay-div-refuse{max-height:5rem;overflow-y:scroll;padding: 0.1rem 0;}
 .lay-div-refuse>.checkbox-list{margin:0 0.2rem;margin-bottom: 0.1rem;}
 .lay-div-refuse>.checkbox-list>.m-form-checkbox{margin:0;}
 .lay-div-refuse>.checkbox-list>.m-form-checkbox>label{margin-right:0;white-space: normal;}
@@ -249,35 +324,34 @@ input, button{ -webkit-appearance: none;-moz-appearance: none;-ms-appearance: no
 
 /*body滚动条*/
 /*滚动条整体部分*/
-body::-webkit-scrollbar, .f-scroll-lt::-webkit-scrollbar{
+.f-scroll-lt::-webkit-scrollbar{
     width:2px;
     height:2px;
 }
 /*滚动条两端的按钮*/
-body::-webkit-scrollbar-button, .f-scroll-lt::-webkit-scrollbar-button{
+.f-scroll-lt::-webkit-scrollbar-button{
     
     display: none !important;
 }
 /*外层轨道*/
-body::-webkit-scrollbar-track, .f-scroll-lt::-webkit-scrollbar-track{
-    background-color:rgba(0,0,0,0.3);
+.f-scroll-lt::-webkit-scrollbar-track{
+    background-color:rgba(0,0,0,0.2);
 }
 /*内层轨道*/
-body::-webkit-scrollbar-track-piece, .f-scroll-lt::-webkit-scrollbar-track-piece{
-background-color:#fff;
+.f-scroll-lt::-webkit-scrollbar-track-piece{
+    background-color:#bbb;
 }
 /*滚动条里面可以拖动的那部分*/
-body::-webkit-scrollbar-thumb, .f-scroll-lt::-webkit-scrollbar-thumb{
-    background-color:rgba(0,0,0,0.3);
-    border-radius:5px;   
+.f-scroll-lt::-webkit-scrollbar-thumb{
+    background-color:rgba(0,0,0,0.2);  
 }
 /*边角*/
-body::-webkit-scrollbar-corner, .f-scroll-lt::-webkit-scrollbar-corner{
+.f-scroll-lt::-webkit-scrollbar-corner{
     
 }
 /*定义右下角拖动块的样式*/
-body::-webkit-scrollbar-resizer, .f-scroll-lt::-webkit-scrollbar-resizer{
-    background-color:rgba(0,0,0,0.3);
+.f-scroll-lt::-webkit-scrollbar-resizer{
+    background-color:rgba(0,0,0,0.2);
 }
 
 /*菜单按钮*/
@@ -324,46 +398,52 @@ body::-webkit-scrollbar-resizer, .f-scroll-lt::-webkit-scrollbar-resizer{
 .navInfoDiv p{ margin: 5px 0; }
 .u-bg>div{background-repeat: no-repeat;background-position:center 35%;background-size:0.48rem;}
 /*开卡*/
-.navBg1>div{background-image:url(../images/sim.png);background-color: #54C7C4;}
+.navBg1>div{background-image:url(../../images/sim.png);background-color: #54C7C4;}
 .navBg1>p{background-color:rgba(63,147,147, 1); color:rgba(63,147,147, 1);}
 /*成卡*/
-/*.navBg2>div{background-image:url(../../assets/images/icon_yuanmeng_chengka.png);background-color:#00B07F;}
+/*.navBg2>div{background-image:url(../../images/icon_yuanmeng_chengka.png);background-color:#00B07F;}
 .navBg2>p{background-color:#00B07F; color:#00B07F;}*/
 /*白卡*/
-/*.navBg3>div{background-image:url(../../assets/images/icon_yuanmeng_baika.png);background-color:#FC7F53;}
+/*.navBg3>div{background-image:url(../../images/icon_yuanmeng_baika.png);background-color:#FC7F53;}
 .navBg3>p{background-color:#FC7F53; color:#FC7F53;}*/
 /*实名补录*/
-/*.navBg4>div{background-image:url(../../assets/images/icon_yuanmeng_bulu.png);background-color: #FF9800;}
-.navBg4>p{background-color:#FF9800; color:#FF9800;}*/
+.navBg4>div{background-image:url(../../images/icon_yuanmeng_bulu.png);background-color: #FF9800;}
+.navBg4>p{background-color:#FF9800; color:#FF9800;}
 /*过户*/
-.navBg5>div{background-image:url(../images/icon_yuanmeng_guohu.png);background-color:#4D96F5;}
+.navBg5>div{background-image:url(../../images/icon_yuanmeng_guohu.png);background-color:#4D96F5;}
 .navBg5>p{background-color:#4D96F5; color:#4D96F5;}
 /*实名登记*/
-.navBg6>div{background-image:url(../images/icon_yuanmeng_dengji.png);background-color:#24BAC9;}
+.navBg6>div{background-image:url(../../images/icon_yuanmeng_dengji.png);background-color:#24BAC9;}
 .navBg6>p{background-color:#24BAC9; color:#24BAC9;}
 
 /*公交一卡通*/
-.navBg7>div{background-image:url(../images/dingdan.png);background-color:#13ce66;}
+.navBg7>div{background-image:url(../../images/dingdan.png);background-color:#13ce66;}
 .navBg7>p{background-color:#13ce66; color:#13ce66;}
 
-.navBg8>div{background-image:url(../images/jiaoyi.png);background-color:#4b3887;}
+.navBg8>div{background-image:url(../../images/jiaoyi.png);background-color:#4b3887;}
 .navBg8>p{background-color:#4b3887; color:#4b3887;}
 /*SDK开卡*/
-.navBg9>div{background-image:url(../images/sim_sdk.png);background-color:#4b3887;}
+.navBg9>div{background-image:url(../../images/sim_sdk.png);background-color:#4b3887;}
 .navBg9>p{background-color:#4b3887; color:#4b3887;}
-/*卡盟通服开卡*/
-.navBg11>div{background-image:url(../images/sim_tf.png);background-color:#4b3887;}
-.navBg11>p{background-color:#4b3887; color:#4b3887;}
+/*卡盟I卡开卡*/
+.navBg11>div{background-image:url(../../images/sim_tf.png);background-color:#D81B60;}
+.navBg11>p{background-color:#D81B60; color:#D81B60;}
 /*激活商户*/
-.navBg10>div{background-image:url(../images/icon_jihuo_audit.png);background-color: #FFB300;}
+.navBg10>div{background-image:url(../../images/icon_jihuo_audit.png);background-color: #FFB300;}
 .navBg10>p{background-color:#FF8F00; color:#FF8F00;}
+/*商户补录*/
+.navBg13>div{background-image:url(../../images/icon_merchant_bulu.png);background-color: #54C7C4;}
+.navBg13>p{background-color:#54C7C4; color:#54C7C4;}
+/* 补换卡 */
 /*卡盟穿戴*/
-.u-icon-back{background-image: url("../images/left.png");background-size: contain;}
+.navBg12>div{background-image:url(../../images/icon_buhuanka.png);background-color: #E18383;}
+.navBg12>p{background-color:#E18383; color:#E18383;}
+.u-icon-back{background-image: url("../../images/left.png");background-size: contain;}
 .u-icon-success-no-circle{
-    background-image: url("../images/rightssss.png");
+    background-image: url("../../images/rightssss.png");
 }
 .u-icon-clear{
-    background-image: url("../images/error.png");
+    background-image: url("../../images/error.png");
 }
 /*layer-loading*/
 .m-loading-mask {

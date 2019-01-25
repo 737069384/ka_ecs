@@ -7,6 +7,7 @@
 <section class="g-search-menu">
   <div id="search" :class="{active:off.details}">
   	<header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+    <section class="m-occlusion" :class="{active:off.isLoad}"></section>
   	<!--查询-->
   	<section v-if="!off.details">
   	<div class="g-search-form">
@@ -60,12 +61,12 @@
 					<label><span class="radio"><input type="radio" value="5" :readonly="form.select!=5" v-model="form.select"><span></span></span><span class="text">订单状态：</span></label>
 				</span>
 				<div class="m-form-radio col-radio">
-					<label><span class="radio"><input type="radio" value="0" v-model="form.context5"><span></span></span><span class="text">全部</span></label>
-					<label><span class="radio"><input type="radio" value="1" v-model="form.context5"><span></span></span><span class="text">占用中</span></label>
-					<label><span class="radio"><input type="radio" value="2" v-model="form.context5"><span></span></span><span class="text">手动解除占用</span></label>
-					<label><span class="radio"><input type="radio" value="3" v-model="form.context5"><span></span></span><span class="text">超时解除占用</span></label>
-					<label><span class="radio"><input type="radio" value="4" v-model="form.context5"><span></span></span><span class="text">开卡中</span></label>
-					<label><span class="radio"><input type="radio" value="5" v-model="form.context5"><span></span></span><span class="text">开卡成功解除占用</span></label>
+					<label><span @click="checked5" class="radio"><input type="radio" value="0" v-model="form.context5"><span></span></span><span class="text">全部</span></label>
+					<label><span @click="checked5" class="radio"><input type="radio" value="1" v-model="form.context5"><span></span></span><span class="text">占用中</span></label>
+					<label><span @click="checked5" class="radio"><input type="radio" value="2" v-model="form.context5"><span></span></span><span class="text">手动解除占用</span></label>
+					<label><span @click="checked5" class="radio"><input type="radio" value="3" v-model="form.context5"><span></span></span><span class="text">超时解除占用</span></label>
+					<label><span @click="checked5" class="radio"><input type="radio" value="4" v-model="form.context5"><span></span></span><span class="text">开卡中</span></label>
+					<label><span @click="checked5" class="radio"><input type="radio" value="5" v-model="form.context5"><span></span></span><span class="text">开卡成功解除占用</span></label>
 				</div>
 			</div>
 			<button class="f-btn f-btn-line" @click="searchList()">查询</button>
@@ -88,7 +89,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr v-for="(todo,index) in list">
+				<tr v-for="(todo,index) in list" :key="index">
 					<td>{{((pageNum-1)*10+(index+1))}}</td>
 					<td>{{todo.orderId}}</td>
 					<td>{{todo.occupyPhone}}（{{ translateData(5,todo.numberLevel) }}）</td>
@@ -158,11 +159,17 @@ export default{
 	},
 	created:function(){
 		this.init()
-	},
+    },
+    watch:{
+        'form.select'(){
+            if(this.form.select!=5){
+                this.form.context5=0;
+            }
+        }
+    },
 	methods:{
 		init:function(){
 			var vm=this;
-
 			vm.form.startTime=laydate.now(0,'YYYY-MM-DD 00:00:00');
 			vm.form.endTime=laydate.now(0,'YYYY-MM-DD 23:59:59');
 		},
@@ -242,14 +249,12 @@ export default{
 		// 导出查询结果excel
 		downLoadList:function(){
 			const vm=this;
-			let json=vm.getForm();
+            let json=vm.getForm();
 			if(!json)return false;
-			json.exportType=3;
 			json.pageNum="-1";
 			let userInfo = getStore("KA_ECS_USER");
 			json.customerId = userInfo.customerId;
 			json.codeId = userInfo.codeId;
-
 			if(vm.off.isLoad)return false;
 			vm.off.isLoad=true;
 			createDownload('km-ecs/w/handler/queryExport',BASE64.encode(JSON.stringify(json)),  function(){
@@ -290,7 +295,10 @@ export default{
 					v==1 ? vm.form.startTime=dates : vm.form.endTime=dates;
 				}
 			});
-		},
+        },
+        checked5(){
+            this.form.select=5;
+        },
 		topShiftClick(){
 			var vm=this;
 			vm.list='';

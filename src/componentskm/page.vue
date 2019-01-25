@@ -17,6 +17,8 @@
 			</li>
 			<li><a @click="handle('next')"><i class="fa-chevron-right"></i></a></li>
 		</ul>
+        &nbsp;
+        <label v-if="maxpage>=10" class="m-input-page">去<input v-model="vpage" type="text" style="">页&nbsp;<button style="padding:5px;border-radius:4px;" @click="handle('index',parseInt(vpage))">确定</button></label>
 		<div v-if="!maxpage" style="text-align:center">暂无数据</div>
 	</div>
 </template>
@@ -27,11 +29,15 @@ export default{
 		maxpage:Number,
 		page:Number,
 		callback:Function
-	},
+    },
+    data(){
+        return{
+            vpage:''
+        }
+    },
 	computed:{
 		pages(){
-			var arr={isHome:!1,isSpace:!1,left:[],right:[]},maxpage=this.maxpage,page=this.page;
-
+			var arr={isHome:!1,isSpace:!1,left:[],right:[]},maxpage=parseInt(this.maxpage),page=parseInt(this.page);
 			if(maxpage<=8){
 		        for(var i=1;i<=maxpage;i++){
 		        	arr.left.push(i)		            
@@ -42,16 +48,15 @@ export default{
 		                arr.isHome=true;
 		                for(var i=maxpage-7;i<=maxpage;i++){
 		                    arr.left.push(i)
-		                }
+                        }
 		            }else{
 		                arr.isHome=true;
 		                for(var i=page;i<=page+4;i++){
 		                    arr.left.push(i)
 		                }
 		                arr.isSpace=true;
-		                arr.right=[maxpage-1,maxpage];
+                        arr.right=[maxpage-1,maxpage];
 		            }
-		            
 		        }else if(page==1){
 		        	arr.isHome=true;
 	                for(var i=1;i<=5;i++){
@@ -85,13 +90,24 @@ export default{
 	                	arr.right=[maxpage-1,maxpage];
 		            }
 		        }
-		        
 		    }
 		    return arr;
 		}
 	},
 	methods:{
 		handle(type,page){
+            let vm = this;
+            if(page>vm.maxpage){
+                layer.open({
+                    content:"请输入正确的页码",
+                    skin: 'msg',
+                    time: 4,
+                    msgSkin:'error',
+                });
+                return false;
+            }
+            
+            vm.vpage="";
 			switch(type){
 		        case 0:
 		            page=page
@@ -106,9 +122,12 @@ export default{
 		            break;
 		        case "home":
 		            page=1
-		            break;
-		    }
-		    this.callback(page);
+                    break;
+                case "index":
+                    page=parseInt(page); 
+                    break;
+            }
+            this.callback(page);
 		}
 	}
 }
@@ -127,7 +146,11 @@ export default{
 .pagination-sm>li:first-child>a{border-bottom-left-radius:3px;border-top-left-radius:3px;}
 .pagination-sm>li:last-child>a{border-top-right-radius:3px;border-bottom-right-radius:3px;}
 .pagination-sm>li>a>i{ display: inline-block; padding:0px 15px; height: 23px;}
-.fa-chevron-left{ background-image: url(../assets/km/images/page-left.png);background-repeat: no-repeat;background-position: center 6px;background-size:50%; }
-.fa-chevron-right{background-image: url(../assets/km/images/page-right.png);background-repeat:  no-repeat;background-position: center 6px;background-size:50%;}
+.fa-chevron-left{ background-image: url(../assets/images/page-left.png);background-repeat: no-repeat;background-position: center 6px;background-size:50%; }
+.fa-chevron-right{background-image: url(../assets/images/page-right.png);background-repeat:  no-repeat;background-position: center 6px;background-size:50%;}
+.m-input-page{height:29px;float:right}
+.m-input-page input{width:66px;height:29px;margin:0 5px;border-radius: 4px;}
+.m-input-page button{height: 28px;background: #fff;outline: none;border: 1px solid #8391a5;cursor: pointer;}
+.m-input-page button:active{box-shadow: 0 0 5px #8391a5}
 </style>
 

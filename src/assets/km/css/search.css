@@ -27,8 +27,8 @@ input:focus {outline: none;border-color: #20a0ff}
 .m-input-button>input:hover + button{border-color: #8391a5;}
 .m-input-button>input:focus + button{border-color:#20a0ff;color:#20a0ff;}
 
-#search, #merchantSearch{padding: 0.15rem;position: relative;}
-#search.active{width:100%;height:100%;position:absolute;padding: 0;}
+#search, #merchantSearch{padding: 0.15rem;position: relative;width: 100%;height: 100%;}
+#search.active{width:100%;height:100%;padding: 0;}
 
 .g-search-menu, .m-search-menu *{width: 100%;height: 100%;}
 .g-search-menu{display: table;position: relative;}
@@ -61,8 +61,12 @@ border-left:10px solid #20a0ff;border-top: 7px solid transparent;border-bottom: 
 .g-search-form>.form-c>.row>.dp{color: #666;}
 .g-search-form>.form-c>.f-btn{display: block;width:30%;margin:0.15rem auto;padding: 0.12rem 0}
 
+.g-search-form>.form-c>.row3{width: 32%;display: inline-block;}
+.g-search-form>.form-c>.row3>.dp{color: #666;}
+
+
 .m-col-2{margin:0.1rem 0;}
-.m-col-2>.col-l{float: left;min-width:0.65rem;line-height: 0.35rem;text-align: right;}
+.m-col-2>.col-l{float: left;min-width:0.7rem;line-height: 0.35rem;text-align: right;}
 .m-col-2>.col-r{margin-left:0.7rem;display: block;margin-right: 0.1rem;}
 .m-col-2>.col-r>.m-space{padding:0 3px;}
 .m-one-font{
@@ -71,12 +75,12 @@ border-left:10px solid #20a0ff;border-top: 7px solid transparent;border-bottom: 
   margin-right:7px;
 }
 .m-time-area{ display: inline-block;}
-.m-time-area>input{text-align: center;font-size: 14px;width: auto;cursor: pointer;}
+.m-time-area>input{text-align: center;font-size: 14px;width: auto !important;cursor: pointer;}
 .m-time-area>input:first-child{
-  border-radius:7px 0 0 7px;
+  border-radius:7px 0 0 7px !important;
 }
 .m-time-area>input:last-child{
-  border-radius:0 7px 7px 0;
+  border-radius:0 7px 7px 0 !important;
 }
 .m-form-radio.col-r{top: -2px;}
 .form-c.o-no-bgc{padding: 0 0.1rem;padding-bottom: 1px;}
@@ -87,10 +91,21 @@ border-left:10px solid #20a0ff;border-top: 7px solid transparent;border-bottom: 
 .form-c.o-no-bgc>.row .text{display: inline-block;color: #999;width: 0.7rem;}
 .form-c.o-no-bgc>.row>.col-radio .text{width: auto;text-align: left;}
 
+.form-c.o-no-bgc>.row3>.input-box{display: inline-block;width: 70%;}
+.form-c.o-no-bgc>.row3>.input-box>input{font-family:fantasy;letter-spacing: 1px;border-color:#eee; }
+.form-c.o-no-bgc>.row3.active input{border-color:#20a0ff;}
+.form-c.o-no-bgc>.row3.active .text{color:#1f2d3d !important;}
+.form-c.o-no-bgc>.row3 .text{display: inline-block;color: #999;width: 0.7rem;}
+.form-c.o-no-bgc>.row3>.col-radio .text{width: auto;text-align: left;}
+
 .o-detail-form{}
 .o-detail-form>.row{margin:0.1rem 0;}
 .o-detail-form>.row>.col-l{width: 0.7rem;text-align: right;}
 .o-detail-form>.row>.col-r{margin-left: 0.7rem;}
+
+.o-detail-form>.row3{margin:0.1rem 0;}
+.o-detail-form>.row3>.col-l{width: 0.7rem;text-align: right;}
+.o-detail-form>.row3>.col-r{margin-left: 0.7rem;}
 
 /*顶部滑块*/
 .m-top-shift{
@@ -170,14 +185,14 @@ border-left:10px solid #20a0ff;border-top: 7px solid transparent;border-bottom: 
 .m-dropdown-select>.drop-button>.text{color: #1f2d3d;font-size: 0.13rem;}
 .m-dropdown-select>.drop-button>.caret{
 display:inline-block;position: absolute;right: 5px;top:50%;width:0.18rem;height:0.18rem;margin-top: -9px;
-  background-image: url(../images/drop-down.png);background-repeat: no-repeat;background-position: center;background-size:100%; }
+  background-image: url(../../images/drop-down.png);background-repeat: no-repeat;background-position: center;background-size:100%; }
 .m-dropdown-select ul{position: absolute;width: 100%;z-index: 999; background-color: #fff;border-radius: 2px;border:1px solid #d1dbe5;box-shadow: 0 2px 4px rgba(0,0,0,.12),0 0 6px rgba(0,0,0,.04);margin:5px 0;}
 .m-dropdown-select ul>li{}
 .m-dropdown-select ul>li>a{display: block;color: #48576a;padding: 8px 10px;line-height: 1.5; height:0.35rem;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;cursor: pointer;}
 .m-dropdown-select ul>li>a:hover{background-color: #e4e8f1}
 .m-dropdown-select ul>li.selected>a:hover, .m-dropdown-select ul>li.selected>a{color: #fff;background-color: #20a0ff}
 .m-dropdown-select>.drop-menu{}
-.m-dropdown-select>.drop-menu>.cascarder>a{background-image: url(../images/drop-left.png);background-repeat: no-repeat;background-position:98% center;background-size:17px; }
+.m-dropdown-select>.drop-menu>.cascarder>a{background-image: url(../../images/drop-left.png);background-repeat: no-repeat;background-position:98% center;background-size:17px; }
 .m-dropdown-select>.drop-menu>.cascarder>ul{display: none;height: 100%; top:-1px;box-sizing: content-box;border-radius: 0 2px 2px 0; left: 100%;margin:0;margin-left: 1px; border-left:none;transition-duration:.3s; }
 .m-dropdown-select>.drop-menu>.cascarder:hover>ul{display: block;}
 
@@ -254,6 +269,13 @@ display:inline-block;position: absolute;right: 5px;top:50%;width:0.18rem;height:
  /* .m-form-radio>label, .m-form-checkbox>label{margin:3px 0;}*/
   .m-form-radio.col-r{top: 5px;}
 }
+
+@media screen and (max-width: 960px){
+    .m-col-2>.col-r{margin-right: 0;}
+    .g-search-form>.form-c>.row3{display: block;width: 100%;}
+   /* .m-form-radio>label, .m-form-checkbox>label{margin:3px 0;}*/
+    .m-form-radio.col-r{top: 5px;}
+  }
 
 /*导出excel的按钮*/
 .btn_export_excel{

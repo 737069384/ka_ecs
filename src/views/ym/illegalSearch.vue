@@ -1,9 +1,10 @@
 <style scoped>
-  @import "../../assets/ym/css/search.css";
+  
 </style>
 <template>
 <div id="search">
   	<header class="m-scroll-bar animated infinite" :class="{active:off.isLoad}"></header>
+    <section class="m-occlusion" :class="{active:off.isLoad}"></section>
   	<section>
 	  	<div class="g-search-form">
 			<div class="m-tag"><b></b>违规查询</div>
@@ -46,6 +47,7 @@
 <script>
 import {reqCommonMethod} from "../../config/service.js";
 import {errorDeal} from "../../config/utils";
+import "../../assets/ym/css/search.css";
 export default{
 	name:'illegalSearch',
 	data (){

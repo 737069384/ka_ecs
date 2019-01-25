@@ -15,6 +15,15 @@
 							<tbody>
 								<tr><td>系统订单号：</td><td>{{ list.orderId }}</td></tr>
 								<tr v-show="list.payOrderId"><td>支付订单号：</td><td>{{ list.payOrderId }}</td></tr>
+								<tr v-show="list.rechargeType==2"><td>充值来源：</td><td>
+									<span v-show="list.sourceType == 1">卡盟APP</span>
+									<span v-show="list.sourceType == 5">远特i卡</span>
+									<span v-show="list.sourceType == 6">远特eSIM</span>
+									<span v-show="list.sourceType == 7">eSIM助手</span>
+									<span v-show="list.sourceType == 8">SDK</span>
+									<span v-show="list.sourceType == 9">国星卡</span>
+									<span v-show="list.sourceType == 10">新零售</span>
+								</td></tr>
 								
 								<tr><td>生成时间：</td><td>{{ getDateTime(list.createTime)[6] }}</td></tr>
 								<tr><td>支付耗时：</td><td>
@@ -39,6 +48,13 @@
 									<span v-show="list.payType==2" class="u-icon-wechat"></span>
 									<span v-show="list.payType==3" class="u-icon-alipay"></span>
 								</td></tr>
+								<tr><td>支付状态：</td><td>
+									<span v-show="list.payStatus==1" class="f-c-yellow">待支付</span>
+									<span v-show="list.payStatus==2" class="f-c-green">支付成功</span>
+									<span v-show="list.payStatus==3" class="f-c-red">支付失败</span>
+									<span v-show="list.payStatus==4" class="f-c-red">关闭订单</span>
+								</td></tr>
+								
 								<tr v-show="list.rechargeType==1"><td>产品号：</td><td>{{ list.productId }}</td></tr>
 								<tr><td>充值面额：</td><td>
 									<span v-if="list.rechargeType==1">{{ list.flowNum+list.flowUnit }}</span>
@@ -50,10 +66,11 @@
 								<tr><td>充值号码：</td><td>{{ list.phone }}</td></tr>
 								<tr v-show="list.rechargeType==1"><td>所属省份：</td><td>{{ list.province }}</td></tr>
 								<tr><td>运营商：</td><td>
-									<span v-show="list.isp==1">移动</span>
-									<span v-show="list.isp==2">联通</span>
-									<span v-show="list.isp==3">电信</span>
-									<span v-show="list.isp==4">远特</span>
+                                    <span v-show="list.isp==1">移动</span>
+                                    <span v-show="list.isp==2">联通</span>
+                                    <span v-show="list.isp==3">电信</span>
+                                    <span v-show="list.isp==4">远特</span>
+                                    <span v-show="list.isp>4">{{list.ispName}}</span>
 								</td></tr>
 								
 								<tr v-show="list.rechargeType==1"><td>订单状态：</td><td>

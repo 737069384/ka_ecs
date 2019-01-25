@@ -16,23 +16,30 @@ module.exports = {
   deploy : {
     test : {
       user : 'root',
-      host : '192.168.10.11',
+      host : '192.168.10.110',
+      ref  : 'origin/dev',
+      repo : 'https://github.com/thinkmix/ka_ecs.git',
+      path : '/usr/local/nginx/html/ka_ecs',
+      'post-deploy' : 'yarn install && yarn build && pm2 reload ecosystem.config.js --env test'
+    },
+    onlineTest : {
+      user : 'root',
+      host : '47.98.43.180',
       ref  : 'origin/master',
       // repo : 'git@github.com:thinkmix/ka_ecs.git',
       repo : 'https://github.com/thinkmix/ka_ecs.git',
-      path : '/root/nginx/html/ka_ecs',
-      'post-deploy' : 'cnpm install && npm run build && pm2 reload ecosystem.config.js --env test'
+      path : '/usr/local/nginx/html/ka_ecs',
+      'post-deploy' : 'yarn install && yarn build && pm2 reload ecosystem.config.js --env production'
     },
     production : {
-        user : 'root',
-        host : '47.97.198.73',
-        ref  : 'origin/master',
-        // repo : 'git@github.com:thinkmix/ka_ecs.git',
-        repo : 'https://github.com/thinkmix/ka_ecs.git',
-        path : '/usr/local/nginx/html/ka_ecs',
-        'post-deploy' : 'cnpm install && npm run build && pm2 reload ecosystem.config.js --env production'
-      },
-  
+      user : 'root',
+      host : '47.97.198.73',
+      ref  : 'origin/master',
+      // repo : 'git@github.com:thinkmix/ka_ecs.git',
+      repo : 'https://github.com/thinkmix/ka_ecs.git',
+      path : '/usr/local/nginx/html/ka_ecs',
+      'post-deploy' : 'yarn install && yarn build && pm2 reload ecosystem.config.js --env production'
+    },
   }
 };
 
